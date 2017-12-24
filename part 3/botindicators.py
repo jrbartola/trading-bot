@@ -11,9 +11,9 @@ class BotIndicators(object):
             return sum(data_points[-period:]) / float(len(data_points[-period:]))
 
     @staticmethod
-    def momentum(dataPoints, period=14):
-        if len(dataPoints) > period -1:
-            return dataPoints[-1] * 100 / dataPoints[-period]
+    def momentum(data_points, period=14):
+        if len(data_points) > period -1:
+            return data_points[-1] * 100 / data_points[-period]
 
     @staticmethod
     def ema(prices, period):
