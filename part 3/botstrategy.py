@@ -1,6 +1,7 @@
 from botlog import BotLog
 from botindicators import BotIndicators
 from bottrade import BotTrade
+import random
 
 class BotStrategy(object):
     def __init__(self, capital):
@@ -16,7 +17,12 @@ class BotStrategy(object):
         self.reserve = capital
 
     def tick(self,candlestick):
-        self.currentPrice = float(candlestick.priceAverage)
+        op, clos = candlestick.open, candlestick.close
+
+        # For backtest history, uniformly sample a random price between the opening and closing
+        self.currentPrice = random.uniform(min(op, clos), max(op, clos))
+        #self.currentPrice = float(candlestick.priceAverage)
+
         self.prices.append(self.currentPrice)
         
         #self.currentClose = float(candlestick['close'])
@@ -26,10 +32,11 @@ class BotStrategy(object):
 
         self.evaluatePositions()
         self.updateOpenTrades()
-        self.showPositions()
+        #self.showPositions()
 
     def evaluatePositions(self):
-        _, _, macd = self.indicators.MACD(self.prices)
+        #_, _, macd = self.indicators.MACD(self.prices)
+        rsi = self.indicators.RSI(self.prices)
 
         openTrades = []
         for trade in self.trades:
@@ -37,11 +44,11 @@ class BotStrategy(object):
                 openTrades.append(trade)
 
         if len(openTrades) < self.numSimulTrades:
-            if self.currentPrice < self.indicators.movingAverage(self.prices,9):
+            if self.currentPrice < self.indicators.movingAverage(self.prices, 9):# and rsi < 45:
                 self.trades.append(BotTrade(self.currentPrice, self.reserve, stopLoss=0.0001))
 
         for trade in openTrades:
-            if self.currentPrice > self.indicators.movingAverage(self.prices, 9) and self.indicators.RSI(self.prices) > 55:
+            if self.currentPrice > self.indicators.movingAverage(self.prices, 9) and rsi > 55:
                 profit, total = trade.close(self.currentPrice)
                 # print("Profit is " + str(profit))
                 # if profit < 0:

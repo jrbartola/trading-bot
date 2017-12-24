@@ -42,7 +42,7 @@ def main(argv):
 
 		strategy = BotStrategy()
 
-		for candlestick in chart.getPoints():
+		for candlestick in chart.get_points():
 			strategy.tick(candlestick)
 
 	else:
@@ -55,10 +55,10 @@ def main(argv):
 
 		while True:
 			try:
-				developingCandlestick.tick(chart.getCurrentPrice())
+				developingCandlestick.tick(chart.get_current_price())
 			except urllib2.URLError:
 				time.sleep(int(30))
-				developingCandlestick.tick(chart.getCurrentPrice())
+				developingCandlestick.tick(chart.get_current_price())
 
 			if (developingCandlestick.isClosed()):
 				candlesticks.append(developingCandlestick)
