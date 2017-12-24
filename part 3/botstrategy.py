@@ -9,9 +9,9 @@ class BotStrategy(object):
         self.prices = []
         self.closes = [] # Needed for Momentum Indicator
         self.trades = []
-        self.currentPrice = ""
-        self.currentClose = ""
-        self.numSimulTrades = 1
+        self.current_price = None
+        self.current_close = None
+        self.max_trades_at_once = 1
         self.indicators = BotIndicators()
         self.profit = 0
         self.reserve = capital
@@ -20,47 +20,48 @@ class BotStrategy(object):
         op, clos = candlestick.open, candlestick.close
 
         # For backtest history, uniformly sample a random price between the opening and closing
-        self.currentPrice = random.uniform(min(op, clos), max(op, clos))
-        #self.currentPrice = float(candlestick.priceAverage)
+        self.current_price = random.uniform(min(op, clos), max(op, clos))
+        #self.current_price = float(candlestick.price_average)
 
-        self.prices.append(self.currentPrice)
+        self.prices.append(self.current_price)
         
-        #self.currentClose = float(candlestick['close'])
-        #self.closes.append(self.currentClose)
+        #self.current_close = float(candlestick['close'])
+        #self.closes.append(self.current_close)
         
-        #self.output.log("Price: "+str(candlestick.priceAverage)+"\tMoving Average: "+str(self.indicators.movingAverage(self.prices,15)))
+        #self.output.log("Price: "+str(candlestick.price_average)+"\tMoving Average: "+str(self.indicators.moving_average(self.prices,15)))
 
-        self.evaluatePositions()
-        self.updateOpenTrades()
+        self.evaluate_positions()
+        self.update_open_trades()
         #self.showPositions()
 
-    def evaluatePositions(self):
-        #_, _, macd = self.indicators.MACD(self.prices)
-        rsi = self.indicators.RSI(self.prices)
+    def evaluate_positions(self):
+        #_, _, macd = self.indicators.macd(self.prices)
+        rsi = self.indicators.rsi(self.prices)
 
-        openTrades = []
+        open_trades = []
         for trade in self.trades:
             if trade.status == "OPEN":
-                openTrades.append(trade)
+                open_trades.append(trade)
 
-        if len(openTrades) < self.numSimulTrades:
-            if self.currentPrice < self.indicators.movingAverage(self.prices, 9):# and rsi < 45:
-                self.trades.append(BotTrade(self.currentPrice, self.reserve, stopLoss=0.0001))
+        if len(open_trades) < self.max_trades_at_once:
+            if self.current_price < self.indicators.moving_average(self.prices, 9):# and rsi < 45:
+                new_trade = BotTrade(self.current_price, self.reserve, stop_loss=0.0001)
+                self.trades.append(new_trade)
 
-        for trade in openTrades:
-            if self.currentPrice > self.indicators.movingAverage(self.prices, 9) and rsi > 55:
-                profit, total = trade.close(self.currentPrice)
+        for trade in open_trades:
+            if self.current_price > self.indicators.moving_average(self.prices, 9) and rsi > 55:
+                profit, total = trade.close(self.current_price)
                 # print("Profit is " + str(profit))
                 # if profit < 0:
                 #     print("Lost Profit")
                 self.profit += profit
                 self.reserve = total
 
-    def updateOpenTrades(self):
+    def update_open_trades(self):
         for trade in self.trades:
             if trade.status == "OPEN":
-                trade.tick(self.currentPrice)
+                trade.tick(self.current_price)
 
-    def showPositions(self):
+    def show_positions(self):
         for trade in self.trades:
-            trade.showTrade()
+            trade.show_trade()
