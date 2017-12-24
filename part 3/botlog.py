@@ -3,4 +3,6 @@ class BotLog(object):
 		pass
 
 	def log(self, message):
-		print message
+		pass
+        #print message
+        pass
