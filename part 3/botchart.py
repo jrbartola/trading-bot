@@ -18,20 +18,21 @@ class BotChart(object):
 
         self.data = []
 
+        with open("secrets.json") as secrets_file:
+            secrets = json.load(secrets_file)
+            secrets_file.close()
+
         if exchange == "poloniex":
-            self.conn = Poloniex('key goes here', 'Secret goes here')
+            self.conn = Poloniex(secrets['poloniex_key'], secrets['poloniex_secret'])
+
             if backtest:
-                rawdata = self.conn.api_query("returnChartData",{"currencyPair":self.pair,"start":self.startTime,"end":self.endTime,"period":self.period})
+                rawdata = self.conn.api_query("get_chart_data", {"currencyPair" :self.pair, "start": self.startTime, "end": self.endTime, "period": self.period})
                 for datum in rawdata:
                     if datum['open'] and datum['close'] and datum['high'] and datum['low']:
                         self.data.append(BotCandlestick(self.period, datum['open'], datum['close'], datum['high'], datum['low'], datum['weightedAverage']))
 
         if exchange == "bittrex":
-            # Creating an instance of the Bittrex class with our secrets.json file
-            with open("secrets.json") as secrets_file:
-                secrets = json.load(secrets_file)
-                secrets_file.close()
-                self.conn = Bittrex(secrets['bittrex_key'], secrets['bittrex_secret'])
+            self.conn = Bittrex(secrets['bittrex_key'], secrets['bittrex_secret'])
 
             if backtest:
                 rawdata = self.conn.get_historical_data(market=self.pair, unit=period, n=1000)
@@ -43,6 +44,6 @@ class BotChart(object):
         return self.data
 
     def get_current_price(self):
-        current_values = self.conn.api_query("returnTicker")
+        current_values = self.conn.api_query("get_ticker")
         last_pair_price = current_values[self.pair]["last"]
         return last_pair_price

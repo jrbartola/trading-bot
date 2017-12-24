@@ -3,9 +3,6 @@ import numpy as np
 
 class BotIndicators(object):
     def __init__(self):
-        self.rsi = []
-        self.rsi_up = 0
-        self.rsi_down = 0
         pass
 
     @staticmethod
@@ -36,48 +33,32 @@ class BotIndicators(object):
         emafast = BotIndicators.ema(prices, nfast)
         return emaslow, emafast, emafast - emaslow        
 
-    def rsi(self, prices, period=14):
+    @staticmethod
+    def rsi(prices, period=14):
         deltas = np.diff(prices)
         seed = deltas[:period + 1]
-        self.rsi_up = seed[seed >= 0].sum() / period
-        self.rsi_down = -seed[seed < 0].sum() / period
+        rsi_up = seed[seed >= 0].sum() / period
+        rsi_down = -seed[seed < 0].sum() / period
 
-        if False and len(self.rsi) > period:
-            n = len(prices) - 1
-            delta = deltas[n - 1]  # cause the diff is 1 shorter
+        rsi = np.zeros_like(prices)
+        rs = rsi_up / rsi_down
+        rsi[:period] = 100. - 100./(1. + rs)
+ 
+        for i in range(period, len(prices)):
+            delta = deltas[i - 1]  # cause the diff is 1 shorter
             if delta > 0:
                 upval = delta
                 downval = 0.
             else:
                 upval = 0.
                 downval = -delta
-
-            self.rsi_up = (self.rsi_up * (period - 1) + upval) / period
-            self.rsi_down = (self.rsi_down * (period - 1) + downval) / period
-            rs = self.rsi_up / self.rsi_down
-            self.rsi = np.append(self.rsi, (100. - 100. / (1. + rs)))
-        else:
-            rsi = np.zeros_like(prices)
-            rs = self.rsi_up / self.rsi_down
-            rsi[:period] = 100. - 100./(1. + rs)
  
-            for i in range(period, len(prices)):
-                delta = deltas[i - 1]  # cause the diff is 1 shorter
-                if delta > 0:
-                    upval = delta
-                    downval = 0.
-                else:
-                    upval = 0.
-                    downval = -delta
- 
-                self.rsi_up = (self.rsi_up*(period - 1) + upval)/period
-                self.rsi_down = (self.rsi_down*(period - 1) + downval)/period
-                rs = self.rsi_up/self.rsi_down
-                rsi[i] = 100. - 100./(1. + rs)
-
-            self.rsi = rsi
+            rsi_up = (rsi_up * (period - 1) + upval) / period
+            rsi_down = (rsi_down * (period - 1) + downval) / period
+            rs = rsi_up/rsi_down
+            rsi[i] = 100. - 100./(1. + rs)
 
         if len(prices) > period:
-            return self.rsi[-1]
+            return rsi[-1]
         else:
             return 50 # output a neutral amount until enough prices in list to calculate rsi

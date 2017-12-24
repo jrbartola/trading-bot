@@ -27,14 +27,14 @@ class poloniex:
 
     def api_query(self, command, req={}):
 
-        if(command == "returnTicker" or command == "return24Volume"):
+        if(command == "get_ticker" or command == "get_24hr_volume"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command))
             return json.loads(ret.read())
-        elif(command == "returnOrderBook"):
+        elif(command == "get_order_book"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + command + '&currencyPair=' + str(req['currencyPair'])))
             return json.loads(ret.read())
-        elif(command == "returnMarketTradeHistory"):
-            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + "returnTradeHistory" + '&currencyPair=' + str(req['currencyPair'])))
+        elif(command == "get_market_trade_history"):
+            ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=' + "get_trade_history" + '&currencyPair=' + str(req['currencyPair'])))
             return json.loads(ret.read())
         elif(command == "returnChartData"):
             ret = urllib2.urlopen(urllib2.Request('https://poloniex.com/public?command=returnChartData&currencyPair=' + str(req['currencyPair']) + '&start=' + str(req['start']) + '&end=' + str(req['end']) + '&period=' + str(req['period'])))
@@ -56,23 +56,23 @@ class poloniex:
 
 
     def returnTicker(self):
-        return self.api_query("returnTicker")
+        return self.api_query("get_ticker")
 
     def return24Volume(self):
-        return self.api_query("return24Volume")
+        return self.api_query("get_24hr_volume")
 
     def returnOrderBook (self, currencyPair):
-        return self.api_query("returnOrderBook", {'currencyPair': currencyPair})
+        return self.api_query("get_order_book", {'currencyPair': currencyPair})
 
     def returnMarketTradeHistory (self, currencyPair):
-        return self.api_query("returnMarketTradeHistory", {'currencyPair': currencyPair})
+        return self.api_query("get_market_trade_history", {'currencyPair': currencyPair})
 
 
     # Returns all of your balances.
     # Outputs: 
     # {"BTC":"0.59098578","LTC":"3.31117268", ... }
     def returnBalances(self):
-        return self.api_query('returnBalances')
+        return self.api_query('get_balances')
 
     # Returns your open orders for a given market, specified by the "currencyPair" POST parameter, e.g. "BTC_XCP"
     # Inputs:
@@ -84,7 +84,7 @@ class poloniex:
     # Amount        Quantity of order
     # total         Total value of order (price * quantity)
     def returnOpenOrders(self,currencyPair):
-        return self.api_query('returnOpenOrders',{"currencyPair":currencyPair})
+        return self.api_query('get_open_orders',{"currencyPair":currencyPair})
 
 
     # Returns your trade history for a given market, specified by the "currencyPair" POST parameter
@@ -97,7 +97,7 @@ class poloniex:
     # total         Total value of order (price * quantity)
     # type          sell or buy
     def returnTradeHistory(self,currencyPair):
-        return self.api_query('returnTradeHistory',{"currencyPair":currencyPair})
+        return self.api_query('get_trade_history',{"currencyPair":currencyPair})
 
     # Places a buy order in a given market. Required POST parameters are "currencyPair", "rate", and "amount". If successful, the method will return the order number.
     # Inputs:

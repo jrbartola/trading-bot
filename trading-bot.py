@@ -57,7 +57,7 @@ def main(argv):
 		elif(startTime and not historicalData):
 			exit()
 		else:
-			currentValues = conn.api_query("returnTicker")
+			currentValues = conn.api_query("get_ticker")
 			lastPairPrice = currentValues[pair]["last"]
 			dataDate = datetime.datetime.now()
 

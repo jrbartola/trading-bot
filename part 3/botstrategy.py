@@ -12,7 +12,7 @@ class BotStrategy(object):
         self.current_price = None
         self.current_close = None
         self.max_trades_at_once = 1
-        self.indicators = BotIndicators()
+        self.indicators = BotIndicators
         self.profit = 0
         self.reserve = capital
 

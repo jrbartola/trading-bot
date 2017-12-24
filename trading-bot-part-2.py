@@ -68,7 +68,7 @@ def main(argv):
 			output.write("""]);var options = {title: 'Price Chart',legend: { position: 'bottom' }};var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));chart.draw(data, options);}</script></head><body><div id="curve_chart" style="width: 100%; height: 100%"></div></body></html>""")
 			exit()
 		else:
-			currentValues = conn.api_query("returnTicker")
+			currentValues = conn.api_query("get_ticker")
 			lastPairPrice = currentValues[pair]["last"]
 			dataDate = datetime.datetime.now()
 
