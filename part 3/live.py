@@ -1,5 +1,6 @@
 import sys, getopt
 import time
+import datetime
 
 from botchart import BotChart
 from botstrategy import BotStrategy
@@ -7,26 +8,33 @@ from botlog import BotLog
 from botcandlestick import BotCandlestick
 
 def main(argv):
-    chart = BotChart("bittrex", "BTC-LTC", 300, False)
+    chart = BotChart("bittrex", "BTC-LTC", "fiveMin", False)
 
-    strategy = BotStrategy()
+    log = BotLog()
 
-    candlesticks = []
-    developingCandlestick = BotCandlestick()
+    strategy = BotStrategy(capital=0.01, pair="BTC-LTC", client=chart.conn)
+
+    # candlesticks = []
+    # developing_candlestick = BotCandlestick()
 
     while True:
         try:
-            developingCandlestick.tick(chart.get_current_price())
+            price = chart.get_current_price()
         except Exception as e:
-            time.sleep(int(30))
-            developingCandlestick.tick(chart.get_current_price())
+            log.log("ERROR: Exception occurred: " + e.message, "error")
+            time.sleep(int(3))
+            price = chart.get_current_price()
 
-        if developingCandlestick.is_closed():
-            candlesticks.append(developingCandlestick)
-            strategy.tick(developingCandlestick)
-            developingCandlestick = BotCandlestick()
+        log.log("Received price: " + str(price))
+
+        strategy.live_tick(price)
+
+        # if developing_candlestick.is_closed():
+        #     candlesticks.append(developing_candlestick)
+        #     strategy.tick(developing_candlestick)
+        #     developing_candlestick = BotCandlestick()
         
-        time.sleep(int(30))
+        time.sleep(int(3))
 
 if __name__ == "__main__":
     main(sys.argv[1:])

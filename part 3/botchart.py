@@ -35,7 +35,7 @@ class BotChart(object):
             self.conn = Bittrex(secrets['bittrex_key'], secrets['bittrex_secret'])
 
             if backtest:
-                rawdata = self.conn.get_historical_data(market=self.pair, unit=period, n=1000)
+                rawdata = self.conn.get_historical_data(market=self.pair, unit=period, n=5000)
                 for datum in rawdata:
                     stick = BotCandlestick(period_map[self.period], datum['O'], datum['C'], datum['H'], datum['L'], (datum['O'] + datum['C'])/2.)
                     self.data.append(stick)
@@ -44,6 +44,6 @@ class BotChart(object):
         return self.data
 
     def get_current_price(self):
-        current_values = self.conn.api_query("get_ticker")
-        last_pair_price = current_values[self.pair]["last"]
+        current_values = self.conn.get_ticker(self.pair)
+        last_pair_price = current_values['result']["Last"]
         return last_pair_price

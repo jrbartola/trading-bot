@@ -10,9 +10,9 @@ coins_pol = ["BTC_ETH", "BTC_LTC", "BTC_XMR", "BTC_OMG", "BTC_XRP", "BTC_SC", "B
          "BTC_GNT", "BTC_VTC", "BTC_ETC", "BTC_STRAT", "BTC_DGB"]
 
 def main(coin):
-    chart = BotChart("bittrex", coin, "fiveMin", start_time=1514044163)
+    chart = BotChart("bittrex", coin, "oneMin", start_time=1514044163)
 
-    strategy = BotStrategy(capital=0.01)
+    strategy = BotStrategy(capital=0.01, pair=coin)
 
     for candlestick in chart.get_points():
         strategy.tick(candlestick)

@@ -54,8 +54,8 @@ class Poloniex:
             jsonRet = json.loads(ret.read())
             return self.post_process(jsonRet)
 
-    def get_ticker(self):
-        return self.api_query("get_ticker")
+    def get_ticker(self, market):
+        return self.api_query("get_ticker", req={'currencyPair': market})
 
     def get_24hr_volume(self):
         return self.api_query("get_24hr_volume")

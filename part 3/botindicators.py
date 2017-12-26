@@ -9,10 +9,11 @@ class BotIndicators(object):
     def moving_average(data_points, period):
         if len(data_points) > 1:
             return sum(data_points[-period:]) / float(len(data_points[-period:]))
+        return 0
 
     @staticmethod
     def momentum(data_points, period=14):
-        if len(data_points) > period -1:
+        if len(data_points) > period - 1:
             return data_points[-1] * 100 / data_points[-period]
 
     @staticmethod
@@ -62,3 +63,10 @@ class BotIndicators(object):
             return rsi[-1]
         else:
             return 50 # output a neutral amount until enough prices in list to calculate rsi
+
+    @staticmethod
+    def bollinger_bands(prices, period=21, k=2):
+        sma = BotIndicators.moving_average(prices, period)
+        std_dev = np.std(prices)
+
+        return sma + k * std_dev, sma - k * std_dev
