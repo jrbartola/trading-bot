@@ -10,6 +10,7 @@ class BotLog(object):
         return "[ " + datetime.fromtimestamp(time()).strftime('%Y-%m-%d %H:%M:%S') + " ]\t"
 
     def log(self, message, type="info"):
+        return
         timestamp = self.timestamp()
 
         message = timestamp + message

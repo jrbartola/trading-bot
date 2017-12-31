@@ -130,16 +130,16 @@ class Bittrex(object):
     # The original bittrx API did not support v2 of the api which returns historical data
     # Credit where it's due :)
     # returns the historical data in the form of a JSON file
-    # n is the number of data points to be returned. By default we return all data (by specifying n as 9999)
+    # n is the number of time periods to be returned. By default we return all data (by specifying period as 9999)
     # valid values for units are 'oneMin', 'fiveMin', 'thirtyMin', 'hour', 'day', 'week', and 'month'
-    def get_historical_data(self, market, unit, n=9999):
+    def get_historical_data(self, market, unit, period=9999):
         request_url = 'https://bittrex.com/Api/v2.0/pub/market/GetTicks?marketName=%s&tickInterval=%s' % (market, unit)
         historical_data = requests.get(request_url,
                                       headers={"apisign": hmac.new(self.api_secret.encode(), request_url.encode(),
                                                                    hashlib.sha512).hexdigest()}
                                       ).json()
 
-        return historical_data['result'][-n:]
+        return historical_data['result'][-period:]
 
     def get_markets(self):
         """

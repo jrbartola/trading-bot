@@ -22,7 +22,7 @@ def main(argv):
             price = chart.get_current_price()
         except Exception as e:
             log.log("ERROR: Exception occurred: " + e.message, "error")
-            time.sleep(int(3))
+            time.sleep(int(1))
             price = chart.get_current_price()
 
         log.log("Received price: " + str(price))
@@ -34,7 +34,7 @@ def main(argv):
         #     strategy.tick(developing_candlestick)
         #     developing_candlestick = BotCandlestick()
         
-        time.sleep(int(3))
+        time.sleep(int(1))
 
 if __name__ == "__main__":
     main(sys.argv[1:])
