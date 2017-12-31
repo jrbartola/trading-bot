@@ -1,24 +1,28 @@
-from botlog import BotLog
-from botindicators import BotIndicators
-from bottrade import BotTrade
 import random
+
 import matplotlib.pyplot as plt
+from indicators.strategy_indicators import StrategyIndicators
+
+from logger import Logger
+from trade import Trade
+
 
 class BotStrategy(object):
-    def __init__(self, pair, capital, backtesting=False, client=None):
-        self.output = BotLog()
+    def __init__(self, pair, capital, client=None):
+        self.output = Logger()
         self.prices = []
         self.closes = [] # Needed for Momentum Indicator
         self.trades = []
+        self.sells = []
+        self.buys = []
         self.current_price = None
         self.timestamp = None
         self.current_close = None
         self.max_trades_at_once = 1
-        self.indicators = BotIndicators
+        self.indicators = StrategyIndicators
         self.profit = 0
         self.pair = pair
         self.reserve = capital
-        self.backtesting = backtesting
         self.client = client
 
     def tick(self, candlestick):
@@ -29,7 +33,6 @@ class BotStrategy(object):
 
         # Append a timestamp so we can add it to the plot
         self.timestamp = candlestick.time
-        #self.current_price = float(candlestick.price_average)
 
         self.prices.append(self.current_price)
 
@@ -37,13 +40,13 @@ class BotStrategy(object):
         self.update_open_trades()
 
     def live_tick(self, current_price):
-        if not self.backtesting:
+        if self.client:
             self.current_price = current_price
 
             self.prices.append(self.current_price)
 
             # Make sure we have enough information to allow our indicators to work properly
-            if len(self.prices) < 50:
+            if len(self.prices) < 30:
                 return
 
             # Reduce the maximum number of data points in memory to at most 100
@@ -53,7 +56,6 @@ class BotStrategy(object):
             self.update_open_trades()
 
     def evaluate_positions(self):
-        #_, _, macd = self.indicators.macd(self.prices)
         rsi = self.indicators.rsi(self.prices)
         nine_period = self.indicators.moving_average(self.prices, 9)
         fifteen_period = self.indicators.moving_average(self.prices, 15)
@@ -62,10 +64,7 @@ class BotStrategy(object):
         percent_diff = self.indicators.percent_difference(self.prices)
         # print(percent_diff)
 
-        open_trades = []
-        for trade in self.trades:
-            if trade.status == "OPEN":
-                open_trades.append(trade)
+        open_trades = [trade for trade in self.trades if trade.status == 'OPEN']
 
         if len(open_trades) < self.max_trades_at_once:
             # if self.current_price < nine_period and self.current_price < fifteen_period and rsi < 40:
@@ -82,19 +81,20 @@ class BotStrategy(object):
 
                     if ret['success'] is True:
                         self.output.log("Buy order was placed with UUID: " + ret['result']['uuid'], "success")
-                        new_trade = BotTrade(self.pair, buy_at, self.reserve, stop_loss=0.00001)
+                        new_trade = Trade(self.pair, buy_at, self.reserve, stop_loss=0.00001)
                         self.reserve = 0
                         self.trades.append(new_trade)
                     else:
                         self.output.log("Buy order was unsuccessful. Reason: " + ret['message'], "error")
                 else:
-                    plt.plot(self.timestamp, self.current_price, 'gx')
-                    new_trade = BotTrade(self.pair, self.current_price, self.reserve, stop_loss=0.00001)
+                    self.buys.append((self.timestamp, self.current_price))
+                    new_trade = Trade(self.pair, self.current_price, self.reserve, stop_loss=0.00001)
                     self.reserve = 0
                     self.trades.append(new_trade)
 
+        ### CHECK TO SEE IF WE NEED TO SELL ANY OPEN POSITIONS
         for trade in open_trades:
-            if self.current_price > (0.3 * bb_diff) + trade.entry_price or (self.current_price > nine_period and self.current_price > fifteen_period and rsi > 60):# and self.current_price > bb2 + 0.75 * bb_diff:
+            if self.current_price > (0.3 * bb_diff) + trade.entry_price or (self.current_price > nine_period and self.current_price > fifteen_period and rsi > 60):
                 if self.client:
 
                     #### USE CLIENT TO SEND API REQUEST TO CLOSE THE TRADE AT A BIT LOWER THAN THE LAST PRICE
@@ -111,7 +111,7 @@ class BotStrategy(object):
                         self.output.log("Sell order was unsuccessful. Reason: " + ret['message'], "error")
 
                 else:
-                    plt.plot(self.timestamp, self.current_price, 'rx')
+                    self.sells.append((self.timestamp, self.current_price))
                     profit, total = trade.close(self.current_price)
                     self.profit += profit
                     self.reserve = total
@@ -141,11 +141,19 @@ class BotStrategy(object):
                         self.output.log("Sell order was unsuccessful. Reason: " + ret['message'], "error")
                 else:
                     profit, total = trade.close(self.current_price)
-                    plt.plot(self.timestamp, self.current_price, 'bx')
-                    self.output.log("STOP LOSS! Closed Trade at " + str(self.current_price) + " BTC. Profit: " + str(profit) + ", BTC: " + str(total), "error")
+                    self.sells.append((self.timestamp, self.current_price))
+                    # self.output.log("STOP LOSS! Closed Trade at " + str(self.current_price) + " BTC. Profit: " + str(profit) + ", BTC: " + str(total), "error")
                     self.profit += profit
                     self.reserve = total
 
     def show_positions(self):
         for trade in self.trades:
             trade.show_trade()
+
+    def plot_buys(self):
+        for timestamp, price in self.buys:
+            plt.plot(timestamp, price, 'gx')
+
+    def plot_sells(self):
+        for timestamp, price in self.sells:
+            plt.plot(timestamp, price, 'rx')

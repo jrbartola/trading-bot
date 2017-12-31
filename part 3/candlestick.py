@@ -1,9 +1,9 @@
 import sys, getopt
 import time
 
-from botlog import BotLog
+from logger import Logger
 
-class BotCandlestick(object):
+class Candlestick(object):
     def __init__(self, period=300, open=None, close=None, high=None, low=None, price_average=None):
         self.current = None
         self.open = open
@@ -12,7 +12,7 @@ class BotCandlestick(object):
         self.low = low
         self.start_time = time.time()
         self.period = period
-        self.output = BotLog()
+        self.output = Logger
         self.price_average = price_average
 
     def tick(self, price):

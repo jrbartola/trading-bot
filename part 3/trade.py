@@ -1,8 +1,9 @@
-from botlog import BotLog
+from logger import Logger
 
-class BotTrade(object):
+
+class Trade(object):
     def __init__(self, pair, current_price, amt_btc, uuid=None, stop_loss=None, client=None):
-        self.output = BotLog()
+        self.output = Logger()
         self.status = "OPEN"
         self.pair = pair
         self.entry_price = current_price
@@ -10,6 +11,7 @@ class BotTrade(object):
         self.amount = amt_btc / current_price
         self.client = client
         self.uuid = uuid
+
         if stop_loss:
             self.stop_loss = current_price - stop_loss
 
@@ -23,7 +25,9 @@ class BotTrade(object):
         btc_ended = self.amount * self.exit_price
         profit = btc_ended - btc_started
 
-        self.output.log("Sold " + self.pair[-3:] + " at " + str(self.exit_price) + ". Profit: " + str(profit) + ", Total BTC: " + str(btc_ended))
+        message_type = "success" if profit > 0 else "error"
+
+        self.output.log("Sold " + self.pair[-3:] + " at " + str(self.exit_price) + ". Profit: " + str(profit) + ", Total BTC: " + str(btc_ended), type=message_type)
 
         return profit, btc_ended
 

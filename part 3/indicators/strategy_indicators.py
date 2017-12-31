@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class BotIndicators(object):
+class StrategyIndicators(object):
     def __init__(self):
         pass
 
@@ -10,15 +10,6 @@ class BotIndicators(object):
         if len(data_points) > 1:
             return sum(data_points[-period:]) / float(len(data_points[-period:]))
         return 0
-
-    @staticmethod
-    def entire_moving_average(data_points, period):
-        ret = np.zeros(period)
-
-        for i in range(period, len(data_points)):
-            ret = np.append(ret, float(sum(data_points[i - period: i]) / period))
-
-        return ret
 
     @staticmethod
     def momentum(data_points, period=14):
@@ -39,8 +30,8 @@ class BotIndicators(object):
 
     @staticmethod
     def macd(prices, nslow=26, nfast=12):
-        emaslow = BotIndicators.ema(prices, nslow)
-        emafast = BotIndicators.ema(prices, nfast)
+        emaslow = StrategyIndicators.ema(prices, nslow)
+        emafast = StrategyIndicators.ema(prices, nfast)
         return emaslow, emafast, emafast - emaslow        
 
     @staticmethod
@@ -75,25 +66,10 @@ class BotIndicators(object):
 
     @staticmethod
     def bollinger_bands(prices, period=21, k=2):
-        sma = BotIndicators.moving_average(prices, period)
+        sma = StrategyIndicators.moving_average(prices, period)
         std_dev = np.std(prices[-period:])
 
         return sma + k * std_dev, sma - k * std_dev
-
-    @staticmethod
-    def entire_bollinger_bands(prices, period=21, k=2):
-        sma = BotIndicators.entire_moving_average(prices, period=21)
-
-        uppers = np.zeros(period)
-        lowers = np.zeros(period)
-
-        for i in range(period, len(prices)):
-            std_dev = np.std(prices[i - period: i])
-            upper, lower = sma[i] + k * std_dev, sma[i] - k * std_dev
-            uppers = np.append(uppers, upper)
-            lowers = np.append(lowers, lower)
-
-        return uppers, lowers
 
     @staticmethod
     def percent_difference(prices):
