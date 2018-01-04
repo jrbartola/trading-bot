@@ -1,0 +1,19 @@
+/* Custom CSS */
+
+$primary-color: #e0be44;
+$secondary-color: #0089ec;
+
+
+body {
+  background-color: #eee;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}

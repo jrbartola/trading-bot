@@ -1,0 +1,7 @@
+{
+"version": 3,
+"mappings": "AAAA,gBAAgB;AAMhB,IAAK;EACH,gBAAgB,EAAE,IAAI;;AAGxB,QAAS;EACP,IAAI,EAAE,IAAI;EACV,cAAc,EAAE,GAAG;;AAGrB,aAAc;EACZ,IAAI,EAAE,IAAI;EACV,MAAM,EAAE,SAAS",
+"sources": ["../scss/botui.scss"],
+"names": [],
+"file": "botui.css"
+}
