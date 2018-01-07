@@ -69,8 +69,12 @@ class Plot extends React.Component {
         const gX = g.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(xAxis)
-            .select(".domain")
-            .remove();
+            .append("text")
+            .attr("fill", "#000")
+            .attr("y", -6)
+            .attr("dx", "85em")
+            .attr("text-anchor", "end")
+            .text("Data Point #");
 
         const gY = g.append("g")
             .call(yAxis)
@@ -82,10 +86,11 @@ class Plot extends React.Component {
             .attr("text-anchor", "end")
             .text("Price (BTC)");
 
-        const inner = g.append('g');
+        const inner = g.append("g");
 
         /* Plot the closing prices */
         const closings = inner.append("path")
+            .attr("clip-path", "url(#clipped-path)")
             .datum(this.props.closingPrices)
             .attr("fill", "none")
             .attr("stroke", "steelblue")
@@ -95,6 +100,7 @@ class Plot extends React.Component {
             .attr("d", line);
 
         const bollinger_upper = inner.append("path")
+            .attr("clip-path", "url(#clipped-path)")
             .datum(this.props.indicators.bollinger_upper)
             .attr("fill", "none")
             .attr("stroke", "orange")
@@ -105,6 +111,7 @@ class Plot extends React.Component {
             .attr("d", indicator);
 
         const bollinger_lower = inner.append("path")
+            .attr("clip-path", "url(#clipped-path)")
             .datum(this.props.indicators.bollinger_lower)
             .attr("fill", "none")
             .attr("stroke", "orange")
@@ -116,6 +123,7 @@ class Plot extends React.Component {
 
         /* Plot all the buys as green dots */
         const buys = inner.selectAll("scatter-buys")
+            .attr("clip-path", "url(#clipped-path)")
             .data(this.props.buys)
             .enter().append("svg:circle")
             .attr("cx", d => x(d[0]))
@@ -125,6 +133,7 @@ class Plot extends React.Component {
 
         /* Plot all the sells as red dots */
         const sells = inner.selectAll("scatter-sells")
+            .attr("clip-path", "url(#clipped-path)")
             .data(this.props.sells)
             .enter().append("svg:circle")
             .attr("cx", d => x(d[0]))
@@ -143,20 +152,38 @@ class Plot extends React.Component {
             .attr("x", 9)
             .attr("dy", ".35em");
 
+        g.append("clipPath")
+            .attr("id", "clipped-path")
+            .append("rect")
+            .attr("class", "overlay")
+            .attr("width", width)
+            .attr("height", height);
+
         const view = g.append("rect")
+            .attr("pointer-events", "all")
             .attr("class", "overlay")
             .attr("width", width)
             .attr("height", height)
             .call(zoom);
 
-        //svg.call(zoom);
+        // svg.call(zoom);
 
         function zoomed() {
             const scale = d3.event.transform.k;
 
             inner.attr("transform", d3.event.transform);
+
+            const xz = d3.event.transform.rescaleX(x);
+            const yz = d3.event.transform.rescaleY(y);
+
             gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
             gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+
+            // closings.attr('d', line.x(d => xz(d[1])));
+            // bollinger_upper.attr('d', indicator.x(d => xz(d)));
+            // bollinger_lower.attr('d', indicator.x(d => xz(d)));
+            // buys.attr('r', 1/scale * 4.5);
+            // sells.attr('r', 1/scale * 4.5);
 
             closings.attr('stroke-width', 1/scale * 1.5);
             bollinger_upper.attr('stroke-width', 1/scale * 1.5);

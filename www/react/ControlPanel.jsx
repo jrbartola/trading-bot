@@ -10,7 +10,7 @@ class ControlPanel extends React.Component {
 
    render() {
 
-       const inputFields = <div className="input-field col s12">
+       const coinFields = <div className="input-field col s12">
                              <div>
                              <select id="coin-pair">
                                <option value="" disabled defaultValue>Pick a coin pair...</option>
@@ -18,19 +18,47 @@ class ControlPanel extends React.Component {
                                      <option key={pair} value={pair}>{pair}</option>
                                  )}
                              </select>
-                             <label>Materialize Select</label>
+                             <label>Coin Pair</label>
                              </div>
                              <div className="input-field col s6">
                                <input placeholder="Eg: 0.01" id="amount-btc" type="text" className="validate" />
                                <label className="active" htmlFor="amount-btc">Capital</label>
                              </div>
                              <div className="input-field col s6">
-                               <input placeholder="Eg: fiveMin" id="time-unit" type="text" className="validate" />
-                               <label className="active" htmlFor="time-unit">Time Unit</label>
+                               <select id="time-unit">
+                               <option value="" disabled defaultValue>Pick a time unit...</option>
+                                 { this.props.timeUnits.map(unit =>
+                                     <option key={unit} value={unit}>{unit}</option>
+                                 )}
+                               </select>
                              </div>
                            </div>;
 
-       const checkboxes = <form action="#">
+       const strategyFields = <div className="input-field col s12">
+                             <div>
+                             <select id="coin-pair">
+                               <option value="" disabled defaultValue>Pick a coin pair...</option>
+                                 { this.props.coinPairs.map(pair =>
+                                     <option key={pair} value={pair}>{pair}</option>
+                                 )}
+                             </select>
+                             <label>Coin Pair</label>
+                             </div>
+                             <div className="input-field col s6">
+                               <input placeholder="Eg: 0.01" id="amount-btc" type="text" className="validate" />
+                               <label className="active" htmlFor="amount-btc">Capital</label>
+                             </div>
+                             <div className="input-field col s6">
+                               <select id="time-unit">
+                               <option value="" disabled defaultValue>Pick a time unit...</option>
+                                 { this.props.timeUnits.map(unit =>
+                                     <option key={unit} value={unit}>{unit}</option>
+                                 )}
+                               </select>
+                             </div>
+                           </div>;
+
+       const indicatorCheckboxes = <form action="#">
                             <p>
                               <input type="checkbox" id="bbands-box" />
                               <label htmlFor="bbands-box">Bollinger Bands</label>
@@ -44,8 +72,12 @@ class ControlPanel extends React.Component {
                               <label htmlFor="ma-15-box">Moving Average (15 Period)</label>
                             </p>
                             <p>
-                              <input type="checkbox" id="tbd" />
-                              <label htmlFor="tbd">TBD</label>
+                              <input type="checkbox" id="macd" />
+                              <label htmlFor="macd">MACD</label>
+                            </p>
+                            <p>
+                              <input type="checkbox" id="rsi" />
+                              <label htmlFor="rsi">Relative Strength Index</label>
                             </p>
                           </form>;
 
@@ -55,19 +87,23 @@ class ControlPanel extends React.Component {
                   <div className="card light-blue accent-3">
                     <div className="card-content white-text">
                         <div className="row">
-                          <div className="col s6 m6">
+                          <div className="col s6 m4">
                             <span className="card-title">Coin Information</span>
-                            { inputFields }
+                            { coinFields }
                           </div>
-                          <div className="col s6 m6">
+                          <div className="col s6 m4">
+                            <span className="card-title">Strategy</span>
+                            { strategyFields }
+                          </div>
+                          <div className="col s6 m4">
                             <span className="card-title">Indicators</span>
-                            { checkboxes }
+                            { indicatorCheckboxes }
                           </div>
                         </div>
                     </div>
                     <div className="card-action">
                       <a onClick={this.requestBacktest} className="waves-effect waves-light btn btn-small">Begin</a>
-                      <span className="right">Profit: {this.props.profit}</span>
+                      <h5 className="right white-text">Profit: {this.props.profit} BTC</h5>
                     </div>
                   </div>
                 </div>
