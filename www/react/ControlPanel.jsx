@@ -4,10 +4,19 @@ class ControlPanel extends React.Component {
 
    constructor(props) {
        super(props);
-       this.state = {};
    }
 
    render() {
+
+       const inputFields = <div className="input-field col s12">
+                             <select>
+                               <option value="" disabled defaultValue>Pick a coin pair...</option>
+                                 { this.props.coinPairs.map(pair =>
+                                     <option key={pair} value={pair}>{pair}</option>
+                                 )}
+                             </select>
+                             <label>Materialize Select</label>
+                           </div>;
 
        const checkboxes = <form action="#">
                             <p>
@@ -31,12 +40,18 @@ class ControlPanel extends React.Component {
 		return (
 		    <div className="row">
                 <div className="col s12 m12">
-                  <div className="card blue-grey darken-1">
+                  <div className="card light-blue accent-3">
                     <div className="card-content white-text">
-                      <span className="card-title">Card Title</span>
-                        { checkboxes }
-                      <p>I am a very simple card. I am good at containing small bits of information.
-                          I am convenient because I require little markup to use effectively.</p>
+                        <div className="row">
+                          <div className="col s6 m6">
+                            <span className="card-title">Coin Information</span>
+                            { inputFields }
+                          </div>
+                          <div className="col s6 m6">
+                            <span className="card-title">Indicators</span>
+                            { checkboxes }
+                          </div>
+                        </div>
                     </div>
                     <div className="card-action">
                       <a className="waves-effect waves-light btn btn-small">Begin</a>
