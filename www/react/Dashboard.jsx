@@ -76,7 +76,7 @@ class Dashboard extends React.Component {
      */
 	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
 	    const url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital +
-                    "&stopLoss=" + stopLoss;
+                    "&stopLoss=" + stopLoss + "&dataPoints=" + period;
 
 	    const target = document.getElementById('d3plot');
         const spinner = new Spinner(this.spinnerOpts).spin(target);

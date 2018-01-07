@@ -23572,7 +23572,7 @@ var Dashboard = function (_React$Component) {
     value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
       var _this2 = this;
 
-      var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital + "&stopLoss=" + stopLoss;
+      var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital + "&stopLoss=" + stopLoss + "&dataPoints=" + period;
 
       var target = document.getElementById('d3plot');
       var spinner = new _spin.Spinner(this.spinnerOpts).spin(target);

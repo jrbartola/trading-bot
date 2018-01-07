@@ -1,7 +1,7 @@
 import sys, getopt
 import matplotlib.pyplot as plt
 from chart import Chart
-from strategy import BotStrategy
+from strategy import Strategy
 import json
 
 coins_bttx = ["BTC-ETH", "BTC-LTC", "BTC-XMR", "BTC-OMG", "BTC-XRP", "BTC-SC", "BTC-XEM", "BTC-DASH", "BTC-LSK",
@@ -13,7 +13,7 @@ coins_pol = ["BTC_ETH", "BTC_LTC", "BTC_XMR", "BTC_OMG", "BTC_XRP", "BTC_SC", "B
 def main(coin):
     chart = Chart("bittrex", coin, "fiveMin", start_time=1514044163)
 
-    strategy = BotStrategy(capital=0.01, pair=coin, trading_fee=0.0025)
+    strategy = Strategy(capital=0.01, pair=coin, trading_fee=0.0025)
 
     for candlestick in chart.get_points():
         strategy.tick(candlestick)
@@ -33,10 +33,10 @@ def main(coin):
 
     print(json.dumps(result))
 
-def backtest(coin_pair, period_length, capital, stop_loss):
-    chart = Chart("bittrex", coin_pair, period_length)
+def backtest(coin_pair, period_length, capital, stop_loss, num_data_points):
+    chart = Chart("bittrex", coin_pair, period_length, length=num_data_points)
 
-    strategy = BotStrategy(capital=capital, pair=coin_pair, trading_fee=0.0025, stop_loss=stop_loss)
+    strategy = Strategy(capital=capital, pair=coin_pair, trading_fee=0.0025, stop_loss=stop_loss)
 
     for candlestick in chart.get_points():
         strategy.tick(candlestick)

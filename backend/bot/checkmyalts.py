@@ -1,6 +1,6 @@
 import sys, getopt
 from chart import Chart
-from strategy import BotStrategy
+from strategy import Strategy
 from logger import Logger
 
 

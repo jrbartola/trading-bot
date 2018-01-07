@@ -7,7 +7,7 @@ from logger import Logger
 from trade import Trade
 
 
-class BotStrategy(object):
+class Strategy(object):
     def __init__(self, pair, capital, client=None, trading_fee=0, stop_loss=0):
         self.output = Logger()
         self.prices = []

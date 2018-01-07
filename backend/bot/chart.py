@@ -13,11 +13,12 @@ from poloniex import Poloniex
 period_map = {"oneMin": 60, "fiveMin": 300, "thirtyMin": 1800, "hour": 3600, "day": 86400, "week": 604800}
 
 class Chart(object):
-    def __init__(self, exchange, pair, period, start_time=time() - 100000, end_time=time(), backtest=True):
+    def __init__(self, exchange, pair, period, start_time=time() - 100000, end_time=time(), backtest=True, length=5000):
 
         self.pair = pair
         self.period = period
         self.backtest = backtest
+        self.length = length
 
         self.startTime = start_time
         self.endTime = end_time
@@ -42,7 +43,7 @@ class Chart(object):
             self.conn = Bittrex(secrets['bittrex_key'], secrets['bittrex_secret'], api_version=API_V2_0)
 
             if backtest:
-                rawdata = self.conn.get_candles(market=self.pair, tick_interval=self.period)['result'][:3000]
+                rawdata = self.conn.get_candles(market=self.pair, tick_interval=self.period)['result'][:length]
 
                 for i in range(len(rawdata)):
                     datum = rawdata[i]

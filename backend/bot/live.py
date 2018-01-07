@@ -3,7 +3,7 @@ import time
 import datetime
 
 from chart import Chart
-from strategy import BotStrategy
+from strategy import Strategy
 from logger import Logger
 from candlestick import Candlestick
 
@@ -12,7 +12,7 @@ def main(argv):
 
     logger = Logger
 
-    strategy = BotStrategy(capital=0.01, pair="BTC-LTC", client=chart.conn)
+    strategy = Strategy(capital=0.01, pair="BTC-LTC", client=chart.conn)
 
     # candlesticks = []
     # developing_candlestick = BotCandlestick()
