@@ -69,9 +69,10 @@ $button-disabled-background: #DFDFDF !default;
 $button-disabled-color: #9F9F9F !default;
 
 // Raised buttons
-$button-raised-background: #980000 !default;
+$button-raised-background: #e0be44 !default;
 $button-raised-background-hover: lighten($button-raised-background, 5%) !default;
 $button-raised-color: #fff !default;
+
 
 // Large buttons
 $button-large-icon-font-size: 1.6rem !default;

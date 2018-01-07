@@ -3388,7 +3388,7 @@ small {
 
 .card {
   position: relative;
-  margin: 0.5rem 0 1rem 0;
+  margin: 1.5rem 1.5rem;
   background-color: #fff;
   transition: box-shadow .25s;
   border-radius: 2px; }
@@ -3709,18 +3709,18 @@ small {
 
 .btn:focus, .btn-large:focus,
 .btn-floating:focus {
-  background-color: #650000; }
+  background-color: #cfa922; }
 
 .btn, .btn-large {
   text-decoration: none;
   color: #fff;
-  background-color: #980000;
+  background-color: #e0be44;
   text-align: center;
   letter-spacing: .5px;
   transition: .2s ease-out;
   cursor: pointer; }
   .btn:hover, .btn-large:hover {
-    background-color: #b20000; }
+    background-color: #e4c65a; }
 
 .btn-floating {
   display: inline-block;
@@ -5347,9 +5347,9 @@ input[type=range]:focus::-ms-fill-upper {
     .side-nav li > a.btn-flat {
       color: #343434; }
     .side-nav li > a.btn:hover, .side-nav li > a.btn-large:hover, .side-nav li > a.btn-large:hover {
-      background-color: #b20000; }
+      background-color: #e4c65a; }
     .side-nav li > a.btn-floating:hover {
-      background-color: #980000; }
+      background-color: #e0be44; }
     .side-nav li > a > i, .side-nav li > a > [class^="mdi-"], .side-nav li > a li > a > [class*="mdi-"], .side-nav li > a > i.material-icons {
       float: left;
       height: 48px;

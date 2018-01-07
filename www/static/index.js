@@ -23471,7 +23471,11 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _Plot = __webpack_require__(78);
+var _ControlPanel = __webpack_require__(78);
+
+var _ControlPanel2 = _interopRequireDefault(_ControlPanel);
+
+var _Plot = __webpack_require__(79);
 
 var _Plot2 = _interopRequireDefault(_Plot);
 
@@ -23501,8 +23505,7 @@ var Dashboard = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ className: 'row' },
-					_react2.default.createElement('div', { className: 'col m6' }),
-					_react2.default.createElement('div', { className: 'col m6' })
+					_react2.default.createElement(_ControlPanel2.default, null)
 				),
 				_react2.default.createElement(_Plot2.default, null)
 			);
@@ -23516,6 +23519,136 @@ exports.default = Dashboard;
 
 /***/ }),
 /* 78 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ControlPanel = function (_React$Component) {
+  _inherits(ControlPanel, _React$Component);
+
+  function ControlPanel(props) {
+    _classCallCheck(this, ControlPanel);
+
+    var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
+
+    _this.state = {};
+    return _this;
+  }
+
+  _createClass(ControlPanel, [{
+    key: "render",
+    value: function render() {
+
+      var checkboxes = _react2.default.createElement(
+        "form",
+        { action: "#" },
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "bbands-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "bbands-box" },
+            "Bollinger Bands"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "ma-9-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "ma-9-box" },
+            "Moving Average (9 Period)"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "ma-15-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "ma-15-box" },
+            "Moving Average (15 Period)"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "tbd" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "tbd" },
+            "TBD"
+          )
+        )
+      );
+
+      return _react2.default.createElement(
+        "div",
+        { className: "row" },
+        _react2.default.createElement(
+          "div",
+          { className: "col s12 m12" },
+          _react2.default.createElement(
+            "div",
+            { className: "card blue-grey darken-1" },
+            _react2.default.createElement(
+              "div",
+              { className: "card-content white-text" },
+              _react2.default.createElement(
+                "span",
+                { className: "card-title" },
+                "Card Title"
+              ),
+              checkboxes,
+              _react2.default.createElement(
+                "p",
+                null,
+                "I am a very simple card. I am good at containing small bits of information. I am convenient because I require little markup to use effectively."
+              )
+            ),
+            _react2.default.createElement(
+              "div",
+              { className: "card-action" },
+              _react2.default.createElement(
+                "a",
+                { className: "waves-effect waves-light btn btn-small" },
+                "Begin"
+              )
+            )
+          )
+        )
+      );
+    }
+  }]);
+
+  return ControlPanel;
+}(_react2.default.Component);
+
+exports.default = ControlPanel;
+
+/***/ }),
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

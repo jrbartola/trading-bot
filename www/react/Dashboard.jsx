@@ -1,5 +1,6 @@
 import React from 'react';
 
+import ControlPanel from './ControlPanel.jsx';
 import Plot from './Plot.jsx';
 
 class Dashboard extends React.Component {
@@ -12,10 +13,7 @@ class Dashboard extends React.Component {
 		return (
 			<div id="dashboard">
 			  <div className="row">
-			    <div className="col m6">
-                </div>
-                <div className="col m6">
-                </div>
+			    <ControlPanel />
 			  </div>
 
 			  <Plot/>
