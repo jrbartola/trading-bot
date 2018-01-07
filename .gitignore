@@ -102,3 +102,4 @@ ENV/
 
 secrets.json
 www/node_modules/
+.idea/
