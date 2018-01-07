@@ -40,7 +40,7 @@ class Plot extends React.Component {
             // formatCurrency = function(d) { return "$" + formatValue(d); };
 
 	    const zoom = d3.zoom()
-            .scaleExtent([1, 6])
+            .scaleExtent([1, 4])
             .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", zoomed);
 
@@ -147,15 +147,16 @@ class Plot extends React.Component {
             .attr("class", "overlay")
             .attr("width", width)
             .attr("height", height)
-            .call(d3.zoom().on("zoom", zoomed));
+            .call(zoom);
 
-        svg.call(zoom);
+        //svg.call(zoom);
 
         function zoomed() {
+            const scale = d3.event.transform.k;
+
             inner.attr("transform", d3.event.transform);
             gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
             gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
-            const scale = d3.event.transform.k;
 
             closings.attr('stroke-width', 1/scale * 1.5);
             bollinger_upper.attr('stroke-width', 1/scale * 1.5);

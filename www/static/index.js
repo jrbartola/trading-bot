@@ -23873,7 +23873,7 @@ var Plot = function (_React$Component) {
                         // formatValue = d3.format(",.2f"),
                         // formatCurrency = function(d) { return "$" + formatValue(d); };
 
-                        var zoom = d3.zoom().scaleExtent([1, 6]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
+                        var zoom = d3.zoom().scaleExtent([1, 4]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
 
                         // const parseTime = d3.timeParse("%d-%b-%y");
 
@@ -23936,15 +23936,16 @@ var Plot = function (_React$Component) {
 
                         focus.append("text").attr("x", 9).attr("dy", ".35em");
 
-                        var view = g.append("rect").attr("class", "overlay").attr("width", width).attr("height", height).call(d3.zoom().on("zoom", zoomed));
+                        var view = g.append("rect").attr("class", "overlay").attr("width", width).attr("height", height).call(zoom);
 
-                        svg.call(zoom);
+                        //svg.call(zoom);
 
                         function zoomed() {
+                                var scale = d3.event.transform.k;
+
                                 inner.attr("transform", d3.event.transform);
                                 gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
                                 gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
-                                var scale = d3.event.transform.k;
 
                                 closings.attr('stroke-width', 1 / scale * 1.5);
                                 bollinger_upper.attr('stroke-width', 1 / scale * 1.5);
