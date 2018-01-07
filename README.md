@@ -4,6 +4,6 @@ Taken from the Cryptocurrency Trading Bot Tutorial on: https://youtube.com/crypt
 
 I have made significant improvements in adding new indicators and integrated the backtesting bot with a UI.
 
-![Alt text](/cryptobot.jpg "The dashboard")
+![Alt text](/cryptobot.JPG "The dashboard")
 
 More documentation coming soon. Stay tuned!
