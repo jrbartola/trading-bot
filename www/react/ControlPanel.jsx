@@ -10,6 +10,8 @@ class ControlPanel extends React.Component {
 
    render() {
 
+       const showIndicators = this.props.showIndicators;
+
        const indicatorDropdown = () =>
                             <select className="indicator-dropdown">
                                <option value="" disabled defaultValue>Choose and indicator...</option>
@@ -92,23 +94,23 @@ class ControlPanel extends React.Component {
 
        const indicatorCheckboxes = <form action="#">
                             <p>
-                              <input type="checkbox" id="bbands-box" />
+                              <input type="checkbox" id="bbands-box" defaultChecked={showIndicators.bollinger} />
                               <label htmlFor="bbands-box">Bollinger Bands</label>
                             </p>
                             <p>
-                              <input type="checkbox" id="ma-9-box" />
+                              <input type="checkbox" id="ma-9-box" defaultChecked={showIndicators.movingaverage9} />
                               <label htmlFor="ma-9-box">Moving Average (9 Period)</label>
                             </p>
                             <p>
-                              <input type="checkbox" id="ma-15-box" />
+                              <input type="checkbox" id="ma-15-box" defaultChecked={showIndicators.movingaverage15} />
                               <label htmlFor="ma-15-box">Moving Average (15 Period)</label>
                             </p>
                             <p>
-                              <input type="checkbox" id="macd" />
+                              <input type="checkbox" id="macd" defaultChecked={showIndicators.macd} />
                               <label htmlFor="macd">MACD</label>
                             </p>
                             <p>
-                              <input type="checkbox" id="rsi" />
+                              <input type="checkbox" id="rsi" defaultChecked={showIndicators.rsi} />
                               <label htmlFor="rsi">Relative Strength Index</label>
                             </p>
                           </form>;

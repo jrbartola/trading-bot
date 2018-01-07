@@ -6,11 +6,11 @@ class BacktestingIndicators(object):
         pass
 
     @staticmethod
-    def historical_moving_average(data_points, period):
+    def historical_moving_average(prices, period):
         ret = np.zeros(period)
 
-        for i in range(period, len(data_points)):
-            ret = np.append(ret, float(sum(data_points[i - period: i]) / period))
+        for i in range(period, len(prices)):
+            ret = np.append(ret, float(sum(prices[i - period: i]) / period))
 
         return ret
 

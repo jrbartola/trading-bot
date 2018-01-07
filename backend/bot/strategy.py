@@ -159,3 +159,133 @@ class Strategy(object):
     def plot_sells(self):
         for timestamp, price in self.sells:
             plt.plot(timestamp, price, 'rx')
+
+from indicators.backtesting_indicators import BacktestingIndicators
+
+'''
+BackTesting Strategy
+'''
+class BacktestingStrategy(object):
+    def __init__(self, pair, capital, trading_fee=0, stop_loss=0):
+        self.output = Logger()
+        self.prices = []
+        self.trades = []
+        self.sells = []
+        self.buys = []
+        self.current_price = None
+        self.timestamp = None
+        self.current_close = None
+        self.max_trades_at_once = 1
+        self.indicators = BacktestingIndicators
+        self.profit = 0
+        self.pair = pair
+        self.reserve = capital
+        self.trading_fee = trading_fee
+        self.stop_loss = stop_loss
+
+    def run(self, candlesticks):
+
+        # Samples a random price within the range [candlestick.open, candlestick.close]
+        sample_price = lambda op, close: random.uniform(min(op, close), max(op, close))
+
+        self.prices = [sample_price(candle.open, candle.close) for candle in candlesticks]
+
+        rsi = self.indicators.historical_rsi(self.prices)
+        nine_period = self.indicators.historical_moving_average(self.prices, 9)
+        fifteen_period = self.indicators.historical_moving_average(self.prices, 15)
+        bb1, bb2 = self.indicators.historical_bollinger_bands(self.prices)
+        bb_diff = bb1 - bb2
+
+        for i in range(len(self.prices)):
+            open_trades = [trade for trade in self.trades if trade.status == 'OPEN']
+
+            ### CHECK TO SEE IF WE CAN OPEN A BUY POSITION
+            if len(open_trades) < self.max_trades_at_once:
+                if self.prices[i] < nine_period[i] and self.prices[i] < fifteen_period[i] and rsi[i] < 50 and self.prices[i] < bb1[i] - 0.8 * bb_diff[i]:
+                    assert self.reserve > 0
+
+                    self.buys.append((i, self.prices[i]))
+                    new_trade = Trade(self.pair, self.prices[i], self.reserve * (1 - self.trading_fee),
+                                      stop_loss=self.stop_loss)
+                    self.reserve = 0
+                    self.trades.append(new_trade)
+
+            ### CHECK TO SEE IF WE NEED TO SELL ANY OPEN POSITIONS
+            for trade in open_trades:
+                if self.prices[i] > (0.25 * bb_diff[i]) + trade.entry_price or (
+                            self.prices[i] > nine_period[i] and self.prices[i] > fifteen_period[i] and rsi[i] > 60):
+
+                    self.sells.append((i, self.prices[i]))
+                    profit, total = trade.close(self.prices[i])
+                    self.profit += profit * (1 - self.trading_fee)
+                    self.reserve = total * (1 - self.trading_fee)
+
+            ### CHECK TO SEE IF WE HAVE ACTIVATED A STOP LOSS
+            for trade in self.trades:
+
+                # Check our stop losses
+                if trade.status == "OPEN" and trade.stop_loss and self.prices[i] < trade.stop_loss:
+                    profit, total = trade.close(self.prices[i])
+                    self.sells.append((i, self.prices[i]))
+                    self.profit += profit * (1 - self.trading_fee)
+                    self.reserve = total * (1 - self.trading_fee)
+
+
+    def tick(self, candlestick):
+        op, clos = candlestick.open, candlestick.close
+
+        # For backtest history, uniformly sample a random price between the opening and closing
+        self.current_price = random.uniform(min(op, clos), max(op, clos))
+
+        # Append a timestamp so we can add it to the plot
+        self.timestamp = candlestick.time
+
+        self.prices.append(self.current_price)
+
+        self.evaluate_positions()
+        self.update_open_trades()
+
+    def evaluate_positions(self):
+        rsi = self.indicators.rsi(self.prices)
+        nine_period = self.indicators.moving_average(self.prices, 9)
+        fifteen_period = self.indicators.moving_average(self.prices, 15)
+        bb1, bb2 = self.indicators.bollinger_bands(self.prices, k=2.)
+        bb_diff = bb1 - bb2
+        percent_diff = self.indicators.percent_difference(self.prices)
+        # print(percent_diff)
+
+        open_trades = [trade for trade in self.trades if trade.status == 'OPEN']
+
+        if len(open_trades) < self.max_trades_at_once:
+            # if self.current_price < nine_period and self.current_price < fifteen_period and rsi < 40:
+            if self.current_price < nine_period and self.current_price < fifteen_period and rsi < 50 and self.current_price < bb1 - 0.8 * bb_diff and percent_diff > 0:
+                assert self.reserve > 0
+
+                self.buys.append((self.timestamp, self.current_price))
+                new_trade = Trade(self.pair, self.current_price, self.reserve * (1 - self.trading_fee), stop_loss=self.stop_loss)
+                self.reserve = 0
+                self.trades.append(new_trade)
+
+        ### CHECK TO SEE IF WE NEED TO SELL ANY OPEN POSITIONS
+        for trade in open_trades:
+            if self.current_price > (0.25 * bb_diff) + trade.entry_price or (self.current_price > nine_period and self.current_price > fifteen_period and rsi > 60):
+
+                self.sells.append((self.timestamp, self.current_price))
+                profit, total = trade.close(self.current_price)
+                self.profit += profit * (1 - self.trading_fee)
+                self.reserve = total * (1 - self.trading_fee)
+
+    def update_open_trades(self):
+        for trade in self.trades:
+
+            # Check our stop losses
+            if trade.status == "OPEN" and trade.stop_loss and self.current_price < trade.stop_loss:
+
+                profit, total = trade.close(self.current_price)
+                self.sells.append((self.timestamp, self.current_price))
+                self.profit += profit * (1 - self.trading_fee)
+                self.reserve = total * (1 - self.trading_fee)
+
+    def show_positions(self):
+        for trade in self.trades:
+            trade.show_trade()
