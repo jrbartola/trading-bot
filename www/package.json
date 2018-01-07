@@ -2,7 +2,7 @@
   "name": "trading-bot",
   "version": "1.0.0",
   "description": "Crypto Automated trading bot interface",
-  "main": "index.js",
+  "main": "static/index.js",
   "scripts": {
     "start": "webpack-dev-server --hot",
     "build": "webpack",

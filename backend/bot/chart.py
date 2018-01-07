@@ -24,7 +24,7 @@ class Chart(object):
 
         self.data = []
 
-        with open("secrets.json") as secrets_file:
+        with open("C:\\Users\\Jesse\\Documents\\Python\\TradingBot\\backend\\bot\\secrets.json") as secrets_file:
             secrets = json.load(secrets_file)
             secrets_file.close()
 
@@ -63,13 +63,54 @@ class Chart(object):
         last_pair_price = current_values['result']["Last"]
         return last_pair_price
 
-    def plot_indicators(self):
+    '''
+    Returns the indicators specified in the **kwargs dictionary as a json-serializable dictionary
+    '''
+    def get_indicators(self, **kwargs):
+        response = {}
+
+        # Get closing historical datapoints
         closings = list(map(lambda x: x.close, self.data))
-        bbupper, bblower = BacktestingIndicators.historical_bollinger_bands(closings)
+
+        # The 'bollinger' keyword argument takes in a period, i.e. bollinger=21
+        if "bollinger" in kwargs:
+            period = kwargs["bollinger"]
+            assert type(period) is int
+
+            bbupper, bblower = BacktestingIndicators.historical_bollinger_bands(closings)
+            response['bollinger_lower'] = list(bblower)
+            response['bollinger_upper'] = list(bbupper)
+
+        # The 'movingaverage' keyword argument takes in a list of periods, i.e. movingaverage=[9,15,21]
+        if "movingaverage" in kwargs:
+            periods = kwargs["movingaverage"]
+            assert type(periods) is list
+
+            for period in periods:
+                response['movingaverage-' + str(period)] = list(BacktestingIndicators.historical_moving_average(closings, period=period))
+
+        return response
+
+    def plot_indicators(self, **kwargs):
+        # Get closing historical datapoints and plot them first
+        closings = list(map(lambda x: x.close, self.data))
         plt.plot(closings)
-        plt.plot(np.arange(21, len(closings)), bbupper[21:], 'g--')
-        plt.plot(np.arange(21, len(closings)), bblower[21:], 'b--')
-        # plt.plot(BotIndicators.entire_moving_average(closings, period=15), 'b--')
-        # plt.plot(BotIndicators.entire_moving_average(closings, period=9), 'g--')
+
+        # The 'bollinger' keyword argument takes in a period, i.e. bollinger=21
+        if "bollinger" in kwargs:
+            period = kwargs["bollinger"]
+            assert type(period) is int
+
+            bbupper, bblower = BacktestingIndicators.historical_bollinger_bands(closings)
+            plt.plot(np.arange(period, len(closings)), bbupper[period:], 'g--')
+            plt.plot(np.arange(period, len(closings)), bblower[period:], 'b--')
+
+        # The 'movingaverage' keyword argument takes in a list of periods, i.e. movingaverage=[9,15,21]
+        if "movingaverage" in kwargs:
+            periods = kwargs["movingaverage"]
+            assert type(periods) is list
+
+            for period in periods:
+                plt.plot(BacktestingIndicators.historical_moving_average(closings, period=period))
 
 

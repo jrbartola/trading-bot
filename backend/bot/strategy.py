@@ -8,7 +8,7 @@ from trade import Trade
 
 
 class BotStrategy(object):
-    def __init__(self, pair, capital, client=None):
+    def __init__(self, pair, capital, client=None, trading_fee=0):
         self.output = Logger()
         self.prices = []
         self.closes = [] # Needed for Momentum Indicator
@@ -24,6 +24,7 @@ class BotStrategy(object):
         self.pair = pair
         self.reserve = capital
         self.client = client
+        self.trading_fee = trading_fee
 
     def tick(self, candlestick):
         op, clos = candlestick.open, candlestick.close
@@ -88,13 +89,13 @@ class BotStrategy(object):
                         self.output.log("Buy order was unsuccessful. Reason: " + ret['message'], "error")
                 else:
                     self.buys.append((self.timestamp, self.current_price))
-                    new_trade = Trade(self.pair, self.current_price, self.reserve, stop_loss=0.00001)
+                    new_trade = Trade(self.pair, self.current_price, self.reserve * (1 - self.trading_fee), stop_loss=0.00001)
                     self.reserve = 0
                     self.trades.append(new_trade)
 
         ### CHECK TO SEE IF WE NEED TO SELL ANY OPEN POSITIONS
         for trade in open_trades:
-            if self.current_price > (0.3 * bb_diff) + trade.entry_price or (self.current_price > nine_period and self.current_price > fifteen_period and rsi > 60):
+            if self.current_price > (0.25 * bb_diff) + trade.entry_price or (self.current_price > nine_period and self.current_price > fifteen_period and rsi > 60):
                 if self.client:
 
                     #### USE CLIENT TO SEND API REQUEST TO CLOSE THE TRADE AT A BIT LOWER THAN THE LAST PRICE
@@ -113,8 +114,8 @@ class BotStrategy(object):
                 else:
                     self.sells.append((self.timestamp, self.current_price))
                     profit, total = trade.close(self.current_price)
-                    self.profit += profit
-                    self.reserve = total
+                    self.profit += profit * (1 - self.trading_fee)
+                    self.reserve = total * (1 - self.trading_fee)
 
     def update_open_trades(self):
         for trade in self.trades:
@@ -135,16 +136,16 @@ class BotStrategy(object):
                     if ret['success'] is True:
                         self.output.log("STOP LOSS! Placed sell order with UUID: " + ret['result']['uuid'], "error")
                         profit, total = trade.close(sell_at)
-                        self.profit += profit
-                        self.reserve = total
+                        self.profit += profit * (1 - self.trading_fee)
+                        self.reserve = total * (1 - self.trading_fee)
                     else:
                         self.output.log("Sell order was unsuccessful. Reason: " + ret['message'], "error")
                 else:
                     profit, total = trade.close(self.current_price)
                     self.sells.append((self.timestamp, self.current_price))
                     # self.output.log("STOP LOSS! Closed Trade at " + str(self.current_price) + " BTC. Profit: " + str(profit) + ", BTC: " + str(total), "error")
-                    self.profit += profit
-                    self.reserve = total
+                    self.profit += profit * (1 - self.trading_fee)
+                    self.reserve = total * (1 - self.trading_fee)
 
     def show_positions(self):
         for trade in self.trades:

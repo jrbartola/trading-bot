@@ -23,10 +23,10 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="../css/botui.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/botui.css') }}" rel="stylesheet">
 
     <!-- Materialize CSS -->
-    <link href="../css/materialize.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/materialize.css') }}" rel="stylesheet">
 
 </head>
 
@@ -44,7 +44,7 @@
   <script src="https://d3js.org/d3.v4.min.js"></script>
 
   <!-- Main Entry Point -->
-  <script src="../index.js"></script>
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
 
 </body>
 
