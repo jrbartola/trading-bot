@@ -10,8 +10,25 @@ class ControlPanel extends React.Component {
 
    render() {
 
-       const coinFields = <div className="input-field col s12">
-                             <div>
+       const indicatorDropdown = () =>
+                            <select className="indicator-dropdown">
+                               <option value="" disabled defaultValue>Choose and indicator...</option>
+                                 <option value="curr-price">Current Price</option>
+                                 <option value="ma9">Moving Average (9 Period)</option>
+                                 <option value="ma15">Moving Average (15 Period)</option>
+                             </select>;
+
+       const comparator = () =>
+                          <select className="comparator">
+                               <option value="" disabled defaultValue>Choose...</option>
+                               <option value="lt">&lt;</option>
+                               <option value="eq">=</option>
+                               <option value="gt">&gt;</option>
+                          </select>;
+
+       const coinFields = <div>
+                            <div className="row">
+                             <div className="input-field col s6">
                              <select id="coin-pair">
                                <option value="" disabled defaultValue>Pick a coin pair...</option>
                                  { this.props.coinPairs.map(pair =>
@@ -24,6 +41,8 @@ class ControlPanel extends React.Component {
                                <input placeholder="Eg: 0.01" id="amount-btc" type="text" className="validate" />
                                <label className="active" htmlFor="amount-btc">Capital</label>
                              </div>
+                            </div>
+                            <div className="row">
                              <div className="input-field col s6">
                                <select id="time-unit">
                                <option value="" disabled defaultValue>Pick a time unit...</option>
@@ -31,30 +50,39 @@ class ControlPanel extends React.Component {
                                      <option key={unit} value={unit}>{unit}</option>
                                  )}
                                </select>
+                               <label>Time Unit</label>
                              </div>
+                             <div className="input-field col s6">
+                               <input defaultValue="0" id="stop-loss" type="text" className="validate" />
+                               <label className="active" htmlFor="stop-loss">Stop Loss</label>
+                             </div>
+                            </div>
                            </div>;
 
        const strategyFields = <div className="input-field col s12">
-                             <div>
-                             <select id="coin-pair">
-                               <option value="" disabled defaultValue>Pick a coin pair...</option>
-                                 { this.props.coinPairs.map(pair =>
-                                     <option key={pair} value={pair}>{pair}</option>
-                                 )}
-                             </select>
-                             <label>Coin Pair</label>
+                             <div className="row">
+                             <div className="input-field col s5">
+                                 { indicatorDropdown() }
+                             <label>Buy When</label>
                              </div>
-                             <div className="input-field col s6">
-                               <input placeholder="Eg: 0.01" id="amount-btc" type="text" className="validate" />
-                               <label className="active" htmlFor="amount-btc">Capital</label>
+                             <div className="input-field col s2">
+                                 { comparator() }
                              </div>
-                             <div className="input-field col s6">
-                               <select id="time-unit">
-                               <option value="" disabled defaultValue>Pick a time unit...</option>
-                                 { this.props.timeUnits.map(unit =>
-                                     <option key={unit} value={unit}>{unit}</option>
-                                 )}
-                               </select>
+                             <div className="input-field col s5">
+                                 { indicatorDropdown() }
+                             </div>
+                             </div>
+                             <div className="row">
+                             <div className="input-field col s5">
+                                 { indicatorDropdown() }
+                             <label>Sell When</label>
+                             </div>
+                             <div className="input-field col s2">
+                                 { comparator() }
+                             </div>
+                             <div className="input-field col s5">
+                                 { indicatorDropdown() }
+                             </div>
                              </div>
                            </div>;
 
@@ -115,8 +143,9 @@ class ControlPanel extends React.Component {
        const coinPair = $('#coin-pair').val();
        const timeUnit = $('#time-unit').val();
        const capital = $('#amount-btc').val();
+       const stopLoss = $('#stop-loss').val();
 
-       this.props.getBacktestingData(coinPair, timeUnit, capital);
+       this.props.getBacktestingData(coinPair, timeUnit, capital, 0, stopLoss);
    }
 
 }

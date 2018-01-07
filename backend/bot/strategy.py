@@ -8,7 +8,7 @@ from trade import Trade
 
 
 class BotStrategy(object):
-    def __init__(self, pair, capital, client=None, trading_fee=0):
+    def __init__(self, pair, capital, client=None, trading_fee=0, stop_loss=0):
         self.output = Logger()
         self.prices = []
         self.closes = [] # Needed for Momentum Indicator
@@ -25,6 +25,7 @@ class BotStrategy(object):
         self.reserve = capital
         self.client = client
         self.trading_fee = trading_fee
+        self.stop_loss = stop_loss
 
     def tick(self, candlestick):
         op, clos = candlestick.open, candlestick.close
@@ -82,14 +83,14 @@ class BotStrategy(object):
 
                     if ret['success'] is True:
                         self.output.log("Buy order was placed with UUID: " + ret['result']['uuid'], "success")
-                        new_trade = Trade(self.pair, buy_at, self.reserve, stop_loss=0.00001)
+                        new_trade = Trade(self.pair, buy_at, self.reserve, stop_loss=self.stop_loss)
                         self.reserve = 0
                         self.trades.append(new_trade)
                     else:
                         self.output.log("Buy order was unsuccessful. Reason: " + ret['message'], "error")
                 else:
                     self.buys.append((self.timestamp, self.current_price))
-                    new_trade = Trade(self.pair, self.current_price, self.reserve * (1 - self.trading_fee), stop_loss=0.00001)
+                    new_trade = Trade(self.pair, self.current_price, self.reserve * (1 - self.trading_fee), stop_loss=self.stop_loss)
                     self.reserve = 0
                     self.trades.append(new_trade)
 

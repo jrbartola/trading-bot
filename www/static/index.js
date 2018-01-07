@@ -23471,13 +23471,13 @@ var _react = __webpack_require__(0);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _spin = __webpack_require__(80);
+var _spin = __webpack_require__(78);
 
-var _ControlPanel = __webpack_require__(78);
+var _ControlPanel = __webpack_require__(79);
 
 var _ControlPanel2 = _interopRequireDefault(_ControlPanel);
 
-var _Plot = __webpack_require__(79);
+var _Plot = __webpack_require__(80);
 
 var _Plot2 = _interopRequireDefault(_Plot);
 
@@ -23500,7 +23500,11 @@ var Dashboard = function (_React$Component) {
     _this.state = {
       indicators: {
         bollinger_upper: [],
-        bollinger_lower: []
+        bollinger_lower: [],
+        macd: [],
+        rsi: [],
+        ma9: [],
+        ma15: []
       },
       closingPrices: [],
       buys: [],
@@ -23560,14 +23564,15 @@ var Dashboard = function (_React$Component) {
        * @param timeUnit: The time unit to extract from historical data (minute, hour, day, etc.)
        * @param capital: The amount of Bitcoin to start out with
        * @param period: The number of time units to grab
+       * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
        */
 
   }, {
     key: 'getBacktestingData',
-    value: function getBacktestingData(coinPair, timeUnit, capital, period) {
+    value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
       var _this2 = this;
 
-      var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital;
+      var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital + "&stopLoss=" + stopLoss;
 
       var target = document.getElementById('d3plot');
       var spinner = new _spin.Spinner(this.spinnerOpts).spin(target);
@@ -23619,482 +23624,6 @@ exports.default = Dashboard;
 
 /***/ }),
 /* 78 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var ControlPanel = function (_React$Component) {
-  _inherits(ControlPanel, _React$Component);
-
-  function ControlPanel(props) {
-    _classCallCheck(this, ControlPanel);
-
-    var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
-
-    _this.requestBacktest = _this.requestBacktest.bind(_this);
-    return _this;
-  }
-
-  _createClass(ControlPanel, [{
-    key: "render",
-    value: function render() {
-
-      var coinFields = _react2.default.createElement(
-        "div",
-        { className: "input-field col s12" },
-        _react2.default.createElement(
-          "div",
-          null,
-          _react2.default.createElement(
-            "select",
-            { id: "coin-pair" },
-            _react2.default.createElement(
-              "option",
-              { value: "", disabled: true, defaultValue: true },
-              "Pick a coin pair..."
-            ),
-            this.props.coinPairs.map(function (pair) {
-              return _react2.default.createElement(
-                "option",
-                { key: pair, value: pair },
-                pair
-              );
-            })
-          ),
-          _react2.default.createElement(
-            "label",
-            null,
-            "Coin Pair"
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "input-field col s6" },
-          _react2.default.createElement("input", { placeholder: "Eg: 0.01", id: "amount-btc", type: "text", className: "validate" }),
-          _react2.default.createElement(
-            "label",
-            { className: "active", htmlFor: "amount-btc" },
-            "Capital"
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "input-field col s6" },
-          _react2.default.createElement(
-            "select",
-            { id: "time-unit" },
-            _react2.default.createElement(
-              "option",
-              { value: "", disabled: true, defaultValue: true },
-              "Pick a time unit..."
-            ),
-            this.props.timeUnits.map(function (unit) {
-              return _react2.default.createElement(
-                "option",
-                { key: unit, value: unit },
-                unit
-              );
-            })
-          )
-        )
-      );
-
-      var strategyFields = _react2.default.createElement(
-        "div",
-        { className: "input-field col s12" },
-        _react2.default.createElement(
-          "div",
-          null,
-          _react2.default.createElement(
-            "select",
-            { id: "coin-pair" },
-            _react2.default.createElement(
-              "option",
-              { value: "", disabled: true, defaultValue: true },
-              "Pick a coin pair..."
-            ),
-            this.props.coinPairs.map(function (pair) {
-              return _react2.default.createElement(
-                "option",
-                { key: pair, value: pair },
-                pair
-              );
-            })
-          ),
-          _react2.default.createElement(
-            "label",
-            null,
-            "Coin Pair"
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "input-field col s6" },
-          _react2.default.createElement("input", { placeholder: "Eg: 0.01", id: "amount-btc", type: "text", className: "validate" }),
-          _react2.default.createElement(
-            "label",
-            { className: "active", htmlFor: "amount-btc" },
-            "Capital"
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "input-field col s6" },
-          _react2.default.createElement(
-            "select",
-            { id: "time-unit" },
-            _react2.default.createElement(
-              "option",
-              { value: "", disabled: true, defaultValue: true },
-              "Pick a time unit..."
-            ),
-            this.props.timeUnits.map(function (unit) {
-              return _react2.default.createElement(
-                "option",
-                { key: unit, value: unit },
-                unit
-              );
-            })
-          )
-        )
-      );
-
-      var indicatorCheckboxes = _react2.default.createElement(
-        "form",
-        { action: "#" },
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "bbands-box" }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "bbands-box" },
-            "Bollinger Bands"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "ma-9-box" }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "ma-9-box" },
-            "Moving Average (9 Period)"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "ma-15-box" }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "ma-15-box" },
-            "Moving Average (15 Period)"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "macd" }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "macd" },
-            "MACD"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "rsi" }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "rsi" },
-            "Relative Strength Index"
-          )
-        )
-      );
-
-      return _react2.default.createElement(
-        "div",
-        { className: "row" },
-        _react2.default.createElement(
-          "div",
-          { className: "col s12 m12" },
-          _react2.default.createElement(
-            "div",
-            { className: "card light-blue accent-3" },
-            _react2.default.createElement(
-              "div",
-              { className: "card-content white-text" },
-              _react2.default.createElement(
-                "div",
-                { className: "row" },
-                _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Coin Information"
-                  ),
-                  coinFields
-                ),
-                _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Strategy"
-                  ),
-                  strategyFields
-                ),
-                _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Indicators"
-                  ),
-                  indicatorCheckboxes
-                )
-              )
-            ),
-            _react2.default.createElement(
-              "div",
-              { className: "card-action" },
-              _react2.default.createElement(
-                "a",
-                { onClick: this.requestBacktest, className: "waves-effect waves-light btn btn-small" },
-                "Begin"
-              ),
-              _react2.default.createElement(
-                "h5",
-                { className: "right white-text" },
-                "Profit: ",
-                this.props.profit,
-                " BTC"
-              )
-            )
-          )
-        )
-      );
-    }
-  }, {
-    key: "requestBacktest",
-    value: function requestBacktest() {
-      var coinPair = $('#coin-pair').val();
-      var timeUnit = $('#time-unit').val();
-      var capital = $('#amount-btc').val();
-
-      this.props.getBacktestingData(coinPair, timeUnit, capital);
-    }
-  }]);
-
-  return ControlPanel;
-}(_react2.default.Component);
-
-exports.default = ControlPanel;
-
-/***/ }),
-/* 79 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-            value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _react = __webpack_require__(0);
-
-var _react2 = _interopRequireDefault(_react);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Plot = function (_React$Component) {
-            _inherits(Plot, _React$Component);
-
-            function Plot(props) {
-                        _classCallCheck(this, Plot);
-
-                        var _this = _possibleConstructorReturn(this, (Plot.__proto__ || Object.getPrototypeOf(Plot)).call(this, props));
-
-                        _this.updatePlot = _this.updatePlot.bind(_this);
-
-                        return _this;
-            }
-
-            _createClass(Plot, [{
-                        key: "render",
-                        value: function render() {
-                                    return _react2.default.createElement(
-                                                "div",
-                                                { className: "row" },
-                                                _react2.default.createElement(
-                                                            "div",
-                                                            { id: "d3plot" },
-                                                            _react2.default.createElement("svg", { width: "960", height: "500" })
-                                                )
-                                    );
-                        }
-            }, {
-                        key: "componentDidMount",
-                        value: function componentDidMount() {
-                                    this.updatePlot();
-                        }
-
-                        /* When component is being updated, erase the previous graph */
-
-            }, {
-                        key: "componentWillUpdate",
-                        value: function componentWillUpdate() {
-                                    $('#d3plot').html('<svg width="960" height="500"></svg>');
-                                    this.updatePlot();
-                        }
-            }, {
-                        key: "updatePlot",
-                        value: function updatePlot() {
-                                    var svg = d3.select("svg"),
-                                        margin = { top: 20, right: 50, bottom: 30, left: 50 },
-                                        width = +svg.attr("width") - margin.left - margin.right,
-                                        height = +svg.attr("height") - margin.top - margin.bottom,
-                                        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-                                    // bisectDate = d3.bisector(function(d) { return d.date; }).left,
-                                    // formatValue = d3.format(",.2f"),
-                                    // formatCurrency = function(d) { return "$" + formatValue(d); };
-
-                                    var zoom = d3.zoom().scaleExtent([1, 4]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
-
-                                    // const parseTime = d3.timeParse("%d-%b-%y");
-
-                                    var x = d3.scaleLinear().rangeRound([0, width]);
-
-                                    var y = d3.scaleLinear().rangeRound([height, 0]);
-
-                                    var line = d3.line().x(function (d) {
-                                                return x(d[0]);
-                                    }).y(function (d) {
-                                                return y(d[1]);
-                                    });
-
-                                    var indicator = d3.line().x(function (d, i) {
-                                                return x(i);
-                                    }).y(function (d) {
-                                                return y(d);
-                                    });
-
-                                    x.domain(d3.extent(this.props.closingPrices, function (d) {
-                                                return d[0];
-                                    }));
-                                    y.domain(d3.extent(this.props.closingPrices, function (d) {
-                                                return d[1];
-                                    }));
-
-                                    var xAxis = d3.axisBottom(x);
-                                    var yAxis = d3.axisLeft(y);
-
-                                    var gX = g.append("g").attr("transform", "translate(0," + height + ")").call(xAxis).append("text").attr("fill", "#000").attr("y", -6).attr("dx", "85em").attr("text-anchor", "end").text("Data Point #");
-
-                                    var gY = g.append("g").call(yAxis).append("text").attr("fill", "#000").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("text-anchor", "end").text("Price (BTC)");
-
-                                    var inner = g.append("g");
-
-                                    /* Plot the closing prices */
-                                    var closings = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.closingPrices).attr("fill", "none").attr("stroke", "steelblue").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 1.5).attr("d", line);
-
-                                    var bollinger_upper = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.bollinger_upper).attr("fill", "none").attr("stroke", "orange").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-dasharray", "5, 5").attr("stroke-width", 1.5).attr("d", indicator);
-
-                                    var bollinger_lower = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.bollinger_lower).attr("fill", "none").attr("stroke", "orange").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-dasharray", "5, 5").attr("stroke-width", 1.5).attr("d", indicator);
-
-                                    /* Plot all the buys as green dots */
-                                    var buys = inner.selectAll("scatter-buys").attr("clip-path", "url(#clipped-path)").data(this.props.buys).enter().append("svg:circle").attr("cx", function (d) {
-                                                return x(d[0]);
-                                    }).attr("cy", function (d) {
-                                                return y(d[1]);
-                                    }).attr("r", 4).attr("fill", "green");
-
-                                    /* Plot all the sells as red dots */
-                                    var sells = inner.selectAll("scatter-sells").attr("clip-path", "url(#clipped-path)").data(this.props.sells).enter().append("svg:circle").attr("cx", function (d) {
-                                                return x(d[0]);
-                                    }).attr("cy", function (d) {
-                                                return y(d[1]);
-                                    }).attr("r", 4).attr("fill", "red");
-
-                                    var focus = g.append("g").attr("class", "focus").style("display", "none");
-
-                                    focus.append("circle").attr("r", 4.5);
-
-                                    focus.append("text").attr("x", 9).attr("dy", ".35em");
-
-                                    g.append("clipPath").attr("id", "clipped-path").append("rect").attr("class", "overlay").attr("width", width).attr("height", height);
-
-                                    var view = g.append("rect").attr("pointer-events", "all").attr("class", "overlay").attr("width", width).attr("height", height).call(zoom);
-
-                                    // svg.call(zoom);
-
-                                    function zoomed() {
-                                                var scale = d3.event.transform.k;
-
-                                                inner.attr("transform", d3.event.transform);
-
-                                                var xz = d3.event.transform.rescaleX(x);
-                                                var yz = d3.event.transform.rescaleY(y);
-
-                                                gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
-                                                gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
-
-                                                // closings.attr('d', line.x(d => xz(d[1])));
-                                                // bollinger_upper.attr('d', indicator.x(d => xz(d)));
-                                                // bollinger_lower.attr('d', indicator.x(d => xz(d)));
-                                                // buys.attr('r', 1/scale * 4.5);
-                                                // sells.attr('r', 1/scale * 4.5);
-
-                                                closings.attr('stroke-width', 1 / scale * 1.5);
-                                                bollinger_upper.attr('stroke-width', 1 / scale * 1.5);
-                                                bollinger_lower.attr('stroke-width', 1 / scale * 1.5);
-                                                buys.attr('r', 1 / scale * 4.5);
-                                                sells.attr('r', 1 / scale * 4.5);
-                                    }
-                        }
-            }]);
-
-            return Plot;
-}(_react2.default.Component);
-
-exports.default = Plot;
-
-/***/ }),
-/* 80 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -24353,6 +23882,553 @@ function convertOffset(x, y, degrees) {
     ];
 }
 
+
+/***/ }),
+/* 79 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var ControlPanel = function (_React$Component) {
+  _inherits(ControlPanel, _React$Component);
+
+  function ControlPanel(props) {
+    _classCallCheck(this, ControlPanel);
+
+    var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
+
+    _this.requestBacktest = _this.requestBacktest.bind(_this);
+    return _this;
+  }
+
+  _createClass(ControlPanel, [{
+    key: "render",
+    value: function render() {
+
+      var indicatorDropdown = function indicatorDropdown() {
+        return _react2.default.createElement(
+          "select",
+          { className: "indicator-dropdown" },
+          _react2.default.createElement(
+            "option",
+            { value: "", disabled: true, defaultValue: true },
+            "Choose and indicator..."
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "curr-price" },
+            "Current Price"
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "ma9" },
+            "Moving Average (9 Period)"
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "ma15" },
+            "Moving Average (15 Period)"
+          )
+        );
+      };
+
+      var comparator = function comparator() {
+        return _react2.default.createElement(
+          "select",
+          { className: "comparator" },
+          _react2.default.createElement(
+            "option",
+            { value: "", disabled: true, defaultValue: true },
+            "Choose..."
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "lt" },
+            "<"
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "eq" },
+            "="
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "gt" },
+            ">"
+          )
+        );
+      };
+
+      var coinFields = _react2.default.createElement(
+        "div",
+        null,
+        _react2.default.createElement(
+          "div",
+          { className: "row" },
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s6" },
+            _react2.default.createElement(
+              "select",
+              { id: "coin-pair" },
+              _react2.default.createElement(
+                "option",
+                { value: "", disabled: true, defaultValue: true },
+                "Pick a coin pair..."
+              ),
+              this.props.coinPairs.map(function (pair) {
+                return _react2.default.createElement(
+                  "option",
+                  { key: pair, value: pair },
+                  pair
+                );
+              })
+            ),
+            _react2.default.createElement(
+              "label",
+              null,
+              "Coin Pair"
+            )
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s6" },
+            _react2.default.createElement("input", { placeholder: "Eg: 0.01", id: "amount-btc", type: "text", className: "validate" }),
+            _react2.default.createElement(
+              "label",
+              { className: "active", htmlFor: "amount-btc" },
+              "Capital"
+            )
+          )
+        ),
+        _react2.default.createElement(
+          "div",
+          { className: "row" },
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s6" },
+            _react2.default.createElement(
+              "select",
+              { id: "time-unit" },
+              _react2.default.createElement(
+                "option",
+                { value: "", disabled: true, defaultValue: true },
+                "Pick a time unit..."
+              ),
+              this.props.timeUnits.map(function (unit) {
+                return _react2.default.createElement(
+                  "option",
+                  { key: unit, value: unit },
+                  unit
+                );
+              })
+            ),
+            _react2.default.createElement(
+              "label",
+              null,
+              "Time Unit"
+            )
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s6" },
+            _react2.default.createElement("input", { defaultValue: "0", id: "stop-loss", type: "text", className: "validate" }),
+            _react2.default.createElement(
+              "label",
+              { className: "active", htmlFor: "stop-loss" },
+              "Stop Loss"
+            )
+          )
+        )
+      );
+
+      var strategyFields = _react2.default.createElement(
+        "div",
+        { className: "input-field col s12" },
+        _react2.default.createElement(
+          "div",
+          { className: "row" },
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s5" },
+            indicatorDropdown(),
+            _react2.default.createElement(
+              "label",
+              null,
+              "Buy When"
+            )
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s2" },
+            comparator()
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s5" },
+            indicatorDropdown()
+          )
+        ),
+        _react2.default.createElement(
+          "div",
+          { className: "row" },
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s5" },
+            indicatorDropdown(),
+            _react2.default.createElement(
+              "label",
+              null,
+              "Sell When"
+            )
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s2" },
+            comparator()
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s5" },
+            indicatorDropdown()
+          )
+        )
+      );
+
+      var indicatorCheckboxes = _react2.default.createElement(
+        "form",
+        { action: "#" },
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "bbands-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "bbands-box" },
+            "Bollinger Bands"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "ma-9-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "ma-9-box" },
+            "Moving Average (9 Period)"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "ma-15-box" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "ma-15-box" },
+            "Moving Average (15 Period)"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "macd" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "macd" },
+            "MACD"
+          )
+        ),
+        _react2.default.createElement(
+          "p",
+          null,
+          _react2.default.createElement("input", { type: "checkbox", id: "rsi" }),
+          _react2.default.createElement(
+            "label",
+            { htmlFor: "rsi" },
+            "Relative Strength Index"
+          )
+        )
+      );
+
+      return _react2.default.createElement(
+        "div",
+        { className: "row" },
+        _react2.default.createElement(
+          "div",
+          { className: "col s12 m12" },
+          _react2.default.createElement(
+            "div",
+            { className: "card light-blue accent-3" },
+            _react2.default.createElement(
+              "div",
+              { className: "card-content white-text" },
+              _react2.default.createElement(
+                "div",
+                { className: "row" },
+                _react2.default.createElement(
+                  "div",
+                  { className: "col s6 m4" },
+                  _react2.default.createElement(
+                    "span",
+                    { className: "card-title" },
+                    "Coin Information"
+                  ),
+                  coinFields
+                ),
+                _react2.default.createElement(
+                  "div",
+                  { className: "col s6 m4" },
+                  _react2.default.createElement(
+                    "span",
+                    { className: "card-title" },
+                    "Strategy"
+                  ),
+                  strategyFields
+                ),
+                _react2.default.createElement(
+                  "div",
+                  { className: "col s6 m4" },
+                  _react2.default.createElement(
+                    "span",
+                    { className: "card-title" },
+                    "Indicators"
+                  ),
+                  indicatorCheckboxes
+                )
+              )
+            ),
+            _react2.default.createElement(
+              "div",
+              { className: "card-action" },
+              _react2.default.createElement(
+                "a",
+                { onClick: this.requestBacktest, className: "waves-effect waves-light btn btn-small" },
+                "Begin"
+              ),
+              _react2.default.createElement(
+                "h5",
+                { className: "right white-text" },
+                "Profit: ",
+                this.props.profit,
+                " BTC"
+              )
+            )
+          )
+        )
+      );
+    }
+  }, {
+    key: "requestBacktest",
+    value: function requestBacktest() {
+      var coinPair = $('#coin-pair').val();
+      var timeUnit = $('#time-unit').val();
+      var capital = $('#amount-btc').val();
+      var stopLoss = $('#stop-loss').val();
+
+      this.props.getBacktestingData(coinPair, timeUnit, capital, 0, stopLoss);
+    }
+  }]);
+
+  return ControlPanel;
+}(_react2.default.Component);
+
+exports.default = ControlPanel;
+
+/***/ }),
+/* 80 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+            value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(0);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Plot = function (_React$Component) {
+            _inherits(Plot, _React$Component);
+
+            function Plot(props) {
+                        _classCallCheck(this, Plot);
+
+                        var _this = _possibleConstructorReturn(this, (Plot.__proto__ || Object.getPrototypeOf(Plot)).call(this, props));
+
+                        _this.updatePlot = _this.updatePlot.bind(_this);
+
+                        return _this;
+            }
+
+            _createClass(Plot, [{
+                        key: "render",
+                        value: function render() {
+                                    return _react2.default.createElement(
+                                                "div",
+                                                { className: "row" },
+                                                _react2.default.createElement(
+                                                            "div",
+                                                            { id: "d3plot" },
+                                                            _react2.default.createElement("svg", { width: "960", height: "500" })
+                                                )
+                                    );
+                        }
+            }, {
+                        key: "componentDidMount",
+                        value: function componentDidMount() {
+                                    this.updatePlot();
+                        }
+
+                        /* When component is being updated, erase the previous graph */
+
+            }, {
+                        key: "componentWillUpdate",
+                        value: function componentWillUpdate() {
+                                    $('#d3plot').html('<svg width="960" height="500"></svg>');
+                                    this.updatePlot();
+                        }
+            }, {
+                        key: "updatePlot",
+                        value: function updatePlot() {
+                                    var svg = d3.select("svg"),
+                                        margin = { top: 20, right: 50, bottom: 30, left: 50 },
+                                        width = +svg.attr("width") - margin.left - margin.right,
+                                        height = +svg.attr("height") - margin.top - margin.bottom,
+                                        g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                                    // bisectDate = d3.bisector(function(d) { return d.date; }).left,
+                                    // formatValue = d3.format(",.2f"),
+                                    // formatCurrency = function(d) { return "$" + formatValue(d); };
+
+                                    var zoom = d3.zoom().scaleExtent([1, 4]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
+
+                                    // const parseTime = d3.timeParse("%d-%b-%y");
+
+                                    var x = d3.scaleLinear().rangeRound([0, width]);
+
+                                    var y = d3.scaleLinear().rangeRound([height, 0]);
+
+                                    var line = d3.line().x(function (d) {
+                                                return x(d[0]);
+                                    }).y(function (d) {
+                                                return y(d[1]);
+                                    });
+
+                                    var indicator = d3.line().x(function (d, i) {
+                                                return x(i);
+                                    }).y(function (d) {
+                                                return y(d);
+                                    });
+
+                                    x.domain(d3.extent(this.props.closingPrices, function (d) {
+                                                return d[0];
+                                    }));
+                                    y.domain(d3.extent(this.props.closingPrices, function (d) {
+                                                return d[1];
+                                    }));
+
+                                    var xAxis = d3.axisBottom(x);
+                                    var yAxis = d3.axisLeft(y);
+
+                                    var gX = g.append("g").attr("transform", "translate(0," + height + ")").call(xAxis).append("text").attr("fill", "#000").attr("y", -6).attr("dx", "85em").attr("text-anchor", "end").text("Data Point #");
+
+                                    var gY = g.append("g").call(yAxis).append("text").attr("fill", "#000").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("text-anchor", "end").text("Price (BTC)");
+
+                                    var inner = g.append("g");
+
+                                    /* Plot the closing prices */
+                                    var closings = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.closingPrices).attr("fill", "none").attr("stroke", "steelblue").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 1.5).attr("d", line);
+
+                                    var bollinger_upper = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.bollinger_upper).attr("fill", "none").attr("stroke", "orange").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-dasharray", "5, 5").attr("stroke-width", 1.5).attr("d", indicator);
+
+                                    var bollinger_lower = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.bollinger_lower).attr("fill", "none").attr("stroke", "orange").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-dasharray", "5, 5").attr("stroke-width", 1.5).attr("d", indicator);
+
+                                    /* Plot all the buys as green dots */
+                                    var buys = inner.selectAll("scatter-buys").attr("clip-path", "url(#clipped-path)").data(this.props.buys).enter().append("svg:circle").attr("cx", function (d) {
+                                                return x(d[0]);
+                                    }).attr("cy", function (d) {
+                                                return y(d[1]);
+                                    }).attr("r", 4).attr("fill", "green");
+
+                                    /* Plot all the sells as red dots */
+                                    var sells = inner.selectAll("scatter-sells").attr("clip-path", "url(#clipped-path)").data(this.props.sells).enter().append("svg:circle").attr("cx", function (d) {
+                                                return x(d[0]);
+                                    }).attr("cy", function (d) {
+                                                return y(d[1]);
+                                    }).attr("r", 4).attr("fill", "red");
+
+                                    var focus = g.append("g").attr("class", "focus").style("display", "none");
+
+                                    focus.append("circle").attr("r", 4.5);
+
+                                    focus.append("text").attr("x", 9).attr("dy", ".35em");
+
+                                    g.append("clipPath").attr("id", "clipped-path").append("rect").attr("class", "overlay").attr("width", width).attr("height", height);
+
+                                    var view = g.append("rect").attr("pointer-events", "all").attr("class", "overlay").attr("width", width).attr("height", height).call(zoom);
+
+                                    // svg.call(zoom);
+
+                                    function zoomed() {
+                                                var scale = d3.event.transform.k;
+
+                                                inner.attr("transform", d3.event.transform);
+
+                                                var xz = d3.event.transform.rescaleX(x);
+                                                var yz = d3.event.transform.rescaleY(y);
+
+                                                gX.call(xAxis.scale(d3.event.transform.rescaleX(x)));
+                                                gY.call(yAxis.scale(d3.event.transform.rescaleY(y)));
+
+                                                // closings.attr('d', line.x(d => xz(d[1])));
+                                                // bollinger_upper.attr('d', indicator.x(d => xz(d)));
+                                                // bollinger_lower.attr('d', indicator.x(d => xz(d)));
+                                                // buys.attr('r', 1/scale * 4.5);
+                                                // sells.attr('r', 1/scale * 4.5);
+
+                                                closings.attr('stroke-width', 1 / scale * 1.5);
+                                                bollinger_upper.attr('stroke-width', 1 / scale * 1.5);
+                                                bollinger_lower.attr('stroke-width', 1 / scale * 1.5);
+                                                buys.attr('r', 1 / scale * 4.5);
+                                                sells.attr('r', 1 / scale * 4.5);
+                                    }
+                        }
+            }]);
+
+            return Plot;
+}(_react2.default.Component);
+
+exports.default = Plot;
 
 /***/ })
 /******/ ]);

@@ -14,6 +14,8 @@ class Trade(object):
 
         if stop_loss:
             self.stop_loss = current_price - stop_loss
+        else:
+            self.stop_loss = None
 
         self.output.log("Opened " + pair + " trade at " + str(self.entry_price) + ". Spent: " + str(amt_btc) + ", Amount:" + str(self.amount) + " " + pair[-3:])
     

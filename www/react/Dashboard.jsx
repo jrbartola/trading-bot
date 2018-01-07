@@ -11,7 +11,11 @@ class Dashboard extends React.Component {
 		this.state = {
 		    indicators: {
 		        bollinger_upper: [],
-                bollinger_lower: []
+                bollinger_lower: [],
+                macd: [],
+                rsi: [],
+                ma9: [],
+                ma15: []
             },
             closingPrices: [],
             buys: [],
@@ -68,9 +72,11 @@ class Dashboard extends React.Component {
      * @param timeUnit: The time unit to extract from historical data (minute, hour, day, etc.)
      * @param capital: The amount of Bitcoin to start out with
      * @param period: The number of time units to grab
+     * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
      */
-	getBacktestingData(coinPair, timeUnit, capital, period) {
-	    const url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital;
+	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
+	    const url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital +
+                    "&stopLoss=" + stopLoss;
 
 	    const target = document.getElementById('d3plot');
         const spinner = new Spinner(this.spinnerOpts).spin(target);

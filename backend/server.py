@@ -29,8 +29,9 @@ def backtesting():
     coin_pair = request.args.get('pair')
     period_length = request.args.get('period')
     capital = float(request.args.get('capital'))
+    stop_loss = float(request.args.get('stopLoss'))
 
-    result = backtest(coin_pair, period_length, capital)
+    result = backtest(coin_pair, period_length, capital, stop_loss)
 
     return json.dumps({'response': 200, 'result': result})
 
