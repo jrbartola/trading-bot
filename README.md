@@ -1,11 +1,9 @@
 # Cryptocurrency Trading Bot
 
-This bot is a work-in-progress and development can be followed on the Cryptocurrency Trading YouTube channel: https://youtube.com/cryptocurrencytrading
+Taken from the Cryptocurrency Trading Bot Tutorial on: https://youtube.com/cryptocurrencytrading
 
-Part 1 and Part 2 are included in this project for future viewers of those videos, but Part 3 is where active development is happening.
+I have made significant improvements in adding new indicators and integrated the backtesting bot with a UI.
 
-Currently, only backtesting using the Poloniex API is supported, but plans for other exchanges and live trading are planned.
+![Alt text](/cryptobot.png "The dashboard")
 
-Backtesting can be run using the following command on Part 3:
-`python backtest.py`
-
+More documentation coming soon. Stay tuned!
