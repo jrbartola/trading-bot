@@ -4,18 +4,30 @@ class ControlPanel extends React.Component {
 
    constructor(props) {
        super(props);
+
+       this.requestBacktest = this.requestBacktest.bind(this);
    }
 
    render() {
 
        const inputFields = <div className="input-field col s12">
-                             <select>
+                             <div>
+                             <select id="coin-pair">
                                <option value="" disabled defaultValue>Pick a coin pair...</option>
                                  { this.props.coinPairs.map(pair =>
                                      <option key={pair} value={pair}>{pair}</option>
                                  )}
                              </select>
                              <label>Materialize Select</label>
+                             </div>
+                             <div className="input-field col s6">
+                               <input placeholder="Eg: 0.01" id="amount-btc" type="text" className="validate" />
+                               <label className="active" htmlFor="amount-btc">Capital</label>
+                             </div>
+                             <div className="input-field col s6">
+                               <input placeholder="Eg: fiveMin" id="time-unit" type="text" className="validate" />
+                               <label className="active" htmlFor="time-unit">Time Unit</label>
+                             </div>
                            </div>;
 
        const checkboxes = <form action="#">
@@ -37,7 +49,7 @@ class ControlPanel extends React.Component {
                             </p>
                           </form>;
 
-		return (
+       return (
 		    <div className="row">
                 <div className="col s12 m12">
                   <div className="card light-blue accent-3">
@@ -54,13 +66,23 @@ class ControlPanel extends React.Component {
                         </div>
                     </div>
                     <div className="card-action">
-                      <a className="waves-effect waves-light btn btn-small">Begin</a>
+                      <a onClick={this.requestBacktest} className="waves-effect waves-light btn btn-small">Begin</a>
+                      <span className="right">Profit: {this.props.profit}</span>
                     </div>
                   </div>
                 </div>
             </div>
-		)
+       )
    }
+
+   requestBacktest() {
+       const coinPair = $('#coin-pair').val();
+       const timeUnit = $('#time-unit').val();
+       const capital = $('#amount-btc').val();
+
+       this.props.getBacktestingData(coinPair, timeUnit, capital);
+   }
+
 }
 
 
