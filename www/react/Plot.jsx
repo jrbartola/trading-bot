@@ -46,7 +46,7 @@ class Plot extends React.Component {
 
         // const parseTime = d3.timeParse("%d-%b-%y");
 
-        const x = d3.scaleTime()
+        const x = d3.scaleLinear()
             .rangeRound([0, width]);
 
         const y = d3.scaleLinear()

@@ -23877,7 +23877,7 @@ var Plot = function (_React$Component) {
 
                         // const parseTime = d3.timeParse("%d-%b-%y");
 
-                        var x = d3.scaleTime().rangeRound([0, width]);
+                        var x = d3.scaleLinear().rangeRound([0, width]);
 
                         var y = d3.scaleLinear().rangeRound([height, 0]);
 
