@@ -13,7 +13,7 @@ from poloniex import Poloniex
 period_map = {"oneMin": 60, "fiveMin": 300, "thirtyMin": 1800, "hour": 3600, "day": 86400, "week": 604800}
 
 class Chart(object):
-    def __init__(self, exchange, pair, period, start_time=time() - 100000, end_time=time(), backtest=True, length=5000):
+    def __init__(self, exchange, pair, period, start_time=time() - 100000, end_time=time(), backtest=True, length=9999999):
 
         self.pair = pair
         self.period = period

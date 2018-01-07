@@ -43,7 +43,7 @@ class ControlPanel extends React.Component {
                              </div>
                             </div>
                             <div className="row">
-                             <div className="input-field col s6">
+                             <div className="input-field col s4">
                                <select id="time-unit">
                                <option value="" disabled defaultValue>Pick a time unit...</option>
                                  { this.props.timeUnits.map(unit =>
@@ -52,9 +52,13 @@ class ControlPanel extends React.Component {
                                </select>
                                <label>Time Unit</label>
                              </div>
-                             <div className="input-field col s6">
+                             <div className="input-field col s4">
                                <input defaultValue="0" id="stop-loss" type="text" className="validate" />
                                <label className="active" htmlFor="stop-loss">Stop Loss</label>
+                             </div>
+                             <div className="input-field col s4">
+                               <input defaultValue="all" id="num-data" type="text" className="validate" />
+                               <label className="active" htmlFor="num-data"># Data Points</label>
                              </div>
                             </div>
                            </div>;
@@ -144,8 +148,13 @@ class ControlPanel extends React.Component {
        const timeUnit = $('#time-unit').val();
        const capital = $('#amount-btc').val();
        const stopLoss = $('#stop-loss').val();
+       let length = $('#num-data').val();
 
-       this.props.getBacktestingData(coinPair, timeUnit, capital, 0, stopLoss);
+       if (length == 'all') {
+           length = 999999;
+       }
+
+       this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss);
    }
 
 }

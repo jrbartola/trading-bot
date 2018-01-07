@@ -24025,7 +24025,7 @@ var ControlPanel = function (_React$Component) {
           { className: "row" },
           _react2.default.createElement(
             "div",
-            { className: "input-field col s6" },
+            { className: "input-field col s4" },
             _react2.default.createElement(
               "select",
               { id: "time-unit" },
@@ -24050,12 +24050,22 @@ var ControlPanel = function (_React$Component) {
           ),
           _react2.default.createElement(
             "div",
-            { className: "input-field col s6" },
+            { className: "input-field col s4" },
             _react2.default.createElement("input", { defaultValue: "0", id: "stop-loss", type: "text", className: "validate" }),
             _react2.default.createElement(
               "label",
               { className: "active", htmlFor: "stop-loss" },
               "Stop Loss"
+            )
+          ),
+          _react2.default.createElement(
+            "div",
+            { className: "input-field col s4" },
+            _react2.default.createElement("input", { defaultValue: "all", id: "num-data", type: "text", className: "validate" }),
+            _react2.default.createElement(
+              "label",
+              { className: "active", htmlFor: "num-data" },
+              "# Data Points"
             )
           )
         )
@@ -24243,8 +24253,13 @@ var ControlPanel = function (_React$Component) {
       var timeUnit = $('#time-unit').val();
       var capital = $('#amount-btc').val();
       var stopLoss = $('#stop-loss').val();
+      var length = $('#num-data').val();
 
-      this.props.getBacktestingData(coinPair, timeUnit, capital, 0, stopLoss);
+      if (length == 'all') {
+        length = 999999;
+      }
+
+      this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss);
     }
   }]);
 
