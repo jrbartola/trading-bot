@@ -33,7 +33,7 @@ def main(coin):
 
     print(json.dumps(result))
 
-def backtest(coin_pair, period_length, capital, stop_loss, num_data_points):
+def backtest(coin_pair, period_length, capital, stop_loss, num_data_points, indicators={}):
     chart = Chart("bittrex", coin_pair, period_length, length=num_data_points)
 
     strategy = BacktestingStrategy(pair=coin_pair, capital=capital, trading_fee=0.0025, stop_loss=stop_loss)
@@ -42,7 +42,8 @@ def backtest(coin_pair, period_length, capital, stop_loss, num_data_points):
     strategy.run(candlesticks)
 
     closings = [[i, d.close] for i, d in enumerate(candlesticks)]
-    indicators = chart.get_indicators(bollinger=21, movingaverage=[9, 15])
+    indicators = chart.get_indicators(**indicators)
+    # indicators = chart.get_indicators(bollinger=21, movingaverage=[9, 15])
 
     result = {'buys': list(strategy.buys), 'sells': list(strategy.sells), 'closingPrices': closings,
               'indicators': indicators, 'profit': round(strategy.profit, 8)}

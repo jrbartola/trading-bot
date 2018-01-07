@@ -156,7 +156,25 @@ class ControlPanel extends React.Component {
            length = 999999;
        }
 
-       this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss);
+       let indicators = {
+           'movingaverage': []
+       };
+
+       if ($('#bbands-box').is(':checked')) {
+           indicators['bollinger'] = 21;
+       }
+
+       if ($('#ma-9-box').is(':checked')) {
+           indicators['movingaverage'].push(9);
+       }
+
+       if ($('#ma-15-box').is(':checked')) {
+           indicators['movingaverage'].push(15);
+       }
+
+
+
+       this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, indicators);
    }
 
 }

@@ -68,7 +68,12 @@ class Chart(object):
     Returns the indicators specified in the **kwargs dictionary as a json-serializable dictionary
     '''
     def get_indicators(self, **kwargs):
-        response = {}
+        response = {
+            'bollinger_upper': [],
+            'bollinger_lower': [],
+            'movingaverage9': [],
+            'movingaverage15': []
+        }
 
         # Get closing historical datapoints
         closings = list(map(lambda x: x.close, self.data))
@@ -88,7 +93,7 @@ class Chart(object):
             assert type(periods) is list
 
             for period in periods:
-                response['movingaverage-' + str(period)] = list(BacktestingIndicators.historical_moving_average(closings, period=period))
+                response['movingaverage' + str(period)] = list(BacktestingIndicators.historical_moving_average(closings, period=period))
 
         return response
 

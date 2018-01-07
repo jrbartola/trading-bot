@@ -22,7 +22,7 @@ if app.debug is not True:
 def index():
     return render_template("index.html")
 
-@app.route("/backtest")
+@app.route("/backtest", methods=['POST'])
 def backtesting():
     import json
 
@@ -32,7 +32,11 @@ def backtesting():
     stop_loss = float(request.args.get('stopLoss'))
     num_data = int(request.args.get('dataPoints'))
 
-    result = backtest(coin_pair, period_length, capital, stop_loss, num_data)
+    post_data = request.get_json()
+    indicators = post_data['indicators']
+
+
+    result = backtest(coin_pair, period_length, capital, stop_loss, num_data, indicators)
 
     return json.dumps({'response': 200, 'result': result})
 

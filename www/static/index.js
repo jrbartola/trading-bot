@@ -23503,8 +23503,8 @@ var Dashboard = function (_React$Component) {
         bollinger_lower: [],
         macd: [],
         rsi: [],
-        ma9: [],
-        ma15: []
+        movingaverage9: [],
+        movingaverage15: []
       },
       closingPrices: [],
       buys: [],
@@ -23566,11 +23566,12 @@ var Dashboard = function (_React$Component) {
        * @param capital: The amount of Bitcoin to start out with
        * @param period: The number of time units to grab
        * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
+       * @param indicators: An object containig key-value pairs of indicators and their parameters.
        */
 
   }, {
     key: 'getBacktestingData',
-    value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
+    value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, indicators) {
       var _this2 = this;
 
       var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital + "&stopLoss=" + stopLoss + "&dataPoints=" + period;
@@ -23578,12 +23579,15 @@ var Dashboard = function (_React$Component) {
       var target = document.getElementById('d3plot');
       var spinner = new _spin.Spinner(this.spinnerOpts).spin(target);
 
-      $.get(url, function (data, _, err) {
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json',
+        url: url,
+        dataType: 'json',
+        data: JSON.stringify({ indicators: indicators }),
+        success: function success(data) {
 
-        if (err.status == 200) {
-
-          console.log("Got backtesting data.");
-          data = JSON.parse(data);
+          console.log("Got backtesting data:", data);
 
           var result = data['result'];
 
@@ -23595,8 +23599,9 @@ var Dashboard = function (_React$Component) {
             indicators: result['indicators'],
             profit: result['profit']
           });
-        } else {
-          swal("Uh oh!", "Something went wrong: Response code " + err.status + ". Please try again.", "error");
+        },
+        error: function error(res) {
+          swal("Uh oh!", "Something went wrong: Response code " + res.status + ". Please try again.", "error");
         }
       });
     }
@@ -24262,7 +24267,23 @@ var ControlPanel = function (_React$Component) {
         length = 999999;
       }
 
-      this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss);
+      var indicators = {
+        'movingaverage': []
+      };
+
+      if ($('#bbands-box').is(':checked')) {
+        indicators['bollinger'] = 21;
+      }
+
+      if ($('#ma-9-box').is(':checked')) {
+        indicators['movingaverage'].push(9);
+      }
+
+      if ($('#ma-15-box').is(':checked')) {
+        indicators['movingaverage'].push(15);
+      }
+
+      this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, indicators);
     }
   }]);
 
@@ -24331,10 +24352,12 @@ var Plot = function (_React$Component) {
                         /* When component is being updated, erase the previous graph */
 
             }, {
-                        key: "componentWillUpdate",
-                        value: function componentWillUpdate() {
+                        key: "componentDidUpdate",
+                        value: function componentDidUpdate() {
                                     $('#d3plot').html('<svg width="960" height="500"></svg>');
                                     this.updatePlot();
+
+                                    console.log(this.props);
                         }
             }, {
                         key: "updatePlot",
@@ -24391,6 +24414,10 @@ var Plot = function (_React$Component) {
 
                                     var bollinger_lower = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.bollinger_lower).attr("fill", "none").attr("stroke", "orange").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-dasharray", "5, 5").attr("stroke-width", 1.5).attr("d", indicator);
 
+                                    var movingaverage9 = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.movingaverage9).attr("fill", "none").attr("stroke", "red").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 1.5).attr("d", indicator);
+
+                                    var movingaverage15 = inner.append("path").attr("clip-path", "url(#clipped-path)").datum(this.props.indicators.movingaverage15).attr("fill", "none").attr("stroke", "green").attr("stroke-linejoin", "round").attr("stroke-linecap", "round").attr("stroke-width", 1.5).attr("d", indicator);
+
                                     /* Plot all the buys as green dots */
                                     var buys = inner.selectAll("scatter-buys").attr("clip-path", "url(#clipped-path)").data(this.props.buys).enter().append("svg:circle").attr("cx", function (d) {
                                                 return x(d[0]);
@@ -24435,6 +24462,8 @@ var Plot = function (_React$Component) {
                                                 // sells.attr('r', 1/scale * 4.5);
 
                                                 closings.attr('stroke-width', 1 / scale * 1.5);
+                                                movingaverage9.attr('stroke-width', 1 / scale * 1.5);
+                                                movingaverage15.attr('stroke-width', 1 / scale * 1.5);
                                                 bollinger_upper.attr('stroke-width', 1 / scale * 1.5);
                                                 bollinger_lower.attr('stroke-width', 1 / scale * 1.5);
                                                 buys.attr('r', 1 / scale * 4.5);

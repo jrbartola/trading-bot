@@ -14,8 +14,8 @@ class Dashboard extends React.Component {
                 bollinger_lower: [],
                 macd: [],
                 rsi: [],
-                ma9: [],
-                ma15: []
+                movingaverage9: [],
+                movingaverage15: []
             },
             closingPrices: [],
             buys: [],
@@ -75,20 +75,24 @@ class Dashboard extends React.Component {
      * @param capital: The amount of Bitcoin to start out with
      * @param period: The number of time units to grab
      * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
+     * @param indicators: An object containig key-value pairs of indicators and their parameters.
      */
-	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss) {
+	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, indicators) {
 	    const url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital +
                     "&stopLoss=" + stopLoss + "&dataPoints=" + period;
 
 	    const target = document.getElementById('d3plot');
         const spinner = new Spinner(this.spinnerOpts).spin(target);
 
-	    $.get(url, (data, _, err) => {
+	    $.ajax({
+            type: 'POST',
+            contentType: 'application/json',
+            url: url,
+            dataType: 'json',
+            data: JSON.stringify({indicators: indicators}),
+            success: data => {
 
-	        if (err.status == 200) {
-
-	            console.log("Got backtesting data.");
-	            data = JSON.parse(data);
+                console.log("Got backtesting data:", data);
 
                 const result = data['result'];
 
@@ -100,11 +104,10 @@ class Dashboard extends React.Component {
                     indicators: result['indicators'],
                     profit: result['profit']
                 });
-
-	        } else {
-	            swal("Uh oh!", "Something went wrong: Response code " + err.status + ". Please try again.", "error");
+            },
+            error: res => {
+                swal("Uh oh!", "Something went wrong: Response code " + res.status + ". Please try again.", "error");
             }
-
         });
     }
 
