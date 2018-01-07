@@ -1,7 +1,7 @@
 import sys, getopt
 import matplotlib.pyplot as plt
 from chart import Chart
-from strategy import Strategy
+from strategy import Strategy, BacktestingStrategy
 import json
 
 coins_bttx = ["BTC-ETH", "BTC-LTC", "BTC-XMR", "BTC-OMG", "BTC-XRP", "BTC-SC", "BTC-XEM", "BTC-DASH", "BTC-LSK",
@@ -36,12 +36,12 @@ def main(coin):
 def backtest(coin_pair, period_length, capital, stop_loss, num_data_points):
     chart = Chart("bittrex", coin_pair, period_length, length=num_data_points)
 
-    strategy = Strategy(capital=capital, pair=coin_pair, trading_fee=0.0025, stop_loss=stop_loss)
+    strategy = BacktestingStrategy(pair=coin_pair, capital=capital, trading_fee=0.0025, stop_loss=stop_loss)
 
-    for candlestick in chart.get_points():
-        strategy.tick(candlestick)
+    candlesticks = chart.get_points()
+    strategy.run(candlesticks)
 
-    closings = [[i, d.close] for i, d in enumerate(chart.get_points())]
+    closings = [[i, d.close] for i, d in enumerate(candlesticks)]
     indicators = chart.get_indicators(bollinger=21, movingaverage=[9, 15])
 
     result = {'buys': list(strategy.buys), 'sells': list(strategy.sells), 'closingPrices': closings,
