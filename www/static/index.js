@@ -24349,15 +24349,13 @@ var Plot = function (_React$Component) {
                                     this.updatePlot();
                         }
 
-                        /* When component is being updated, erase the previous graph */
+                        /* When component is being updated, erase the previous graph and replace it with new data */
 
             }, {
                         key: "componentDidUpdate",
                         value: function componentDidUpdate() {
                                     $('#d3plot').html('<svg width="960" height="500"></svg>');
                                     this.updatePlot();
-
-                                    console.log(this.props);
                         }
             }, {
                         key: "updatePlot",
