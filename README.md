@@ -14,7 +14,7 @@ First, clone or download the repository to your computer.
 
 **Front End**- Navigate to the *www* directory and run `npm install`. Make sure you have the latest version of node.js installed on your computer.
 
-**Back End**- The server should run with both python 2.7.x and 3.x. The only dependency is flask, so just do a quick `pip install flask` and you'll be all set.
+**Back End**- The server should run with both python 2.7.x and 3.x. The only dependencies are numpy and flask, so just do a quick `pip install flask`, `pip install numpy` and you'll be all set.
 
 ## Running the Application
 
