@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack-dev-server --hot",
     "build": "webpack",
-    "test": "test"
+    "watch": "webpack --watch",
+    "test": ""
   },
   "author": "Jesse Bartola",
   "license": "ISC",
