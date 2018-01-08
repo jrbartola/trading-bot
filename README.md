@@ -36,10 +36,18 @@ Next, navigate to the *backend* directory and run `python server.py`. Now you're
 ## How does it work?
 
 First, you'll select the coin pair you want to trade with. 
+
 "Capital" is the amount of BTC you want to start out with trading.
+
 "Time Unit" is the duration of each point on the time series of historical data.
+
 "Stop Loss" is the amount of BTC below each buy price that you will sell your position at. The smaller the stop loss, the less your risk.
+
 "# Data Points" is the number of data points from the historical data to backtest on. It defaults to a value of "all", which processes all data points. Besides that, any positive integer value is valid for this field.
+
+## What's on the Graph?
+
+Green dots represent buy points. Red dots represent sell points. The blue line is the plot of historical closing prices, and the dotted yellow lines are Bollinger Bands. Moving averages will appear red and green, but this will be customizable later.
 
 ## Coming Soon
 
