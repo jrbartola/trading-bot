@@ -1,4 +1,3 @@
-import sys, getopt
 import time
 
 from logger import Logger

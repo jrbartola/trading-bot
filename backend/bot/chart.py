@@ -25,7 +25,7 @@ class Chart(object):
 
         self.data = []
 
-        with open("C:\\Users\\Jesse\\Documents\\Python\\TradingBot\\backend\\bot\\secrets.json") as secrets_file:
+        with open("bot/secrets.json") as secrets_file:
             secrets = json.load(secrets_file)
             secrets_file.close()
 
@@ -68,6 +68,8 @@ class Chart(object):
     Returns the indicators specified in the **kwargs dictionary as a json-serializable dictionary
     '''
     def get_indicators(self, **kwargs):
+
+        # Indicators are hardcoded for now. Will be updated to accommodate variable-sized MA's
         response = {
             'bollinger_upper': [],
             'bollinger_lower': [],
@@ -98,6 +100,7 @@ class Chart(object):
         return response
 
     def plot_indicators(self, **kwargs):
+
         # Get closing historical datapoints and plot them first
         closings = list(map(lambda x: x.close, self.data))
         plt.plot(closings)

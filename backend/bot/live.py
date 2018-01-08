@@ -1,6 +1,5 @@
 import sys, getopt
 import time
-import datetime
 
 from chart import Chart
 from strategy import Strategy

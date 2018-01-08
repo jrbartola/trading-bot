@@ -14,10 +14,11 @@ class ControlPanel extends React.Component {
 
        const indicatorDropdown = () =>
                             <select className="indicator-dropdown">
-                               <option value="" disabled defaultValue>Choose and indicator...</option>
+                               <option value="" disabled defaultValue>Choose an indicator...</option>
                                  <option value="curr-price">Current Price</option>
                                  <option value="ma9">Moving Average (9 Period)</option>
                                  <option value="ma15">Moving Average (15 Period)</option>
+                                 <option value="rsi">RSI</option>
                              </select>;
 
        const comparator = () =>

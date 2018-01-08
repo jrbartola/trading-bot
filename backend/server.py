@@ -1,12 +1,7 @@
-from flask import Flask, request, jsonify, send_from_directory, render_template
-from flask_cors import CORS, cross_origin
+from flask import Flask, request, jsonify, render_template
 from bot.backtest import backtest
 
-from datetime import datetime
-
-app = Flask(__name__, static_folder='C:\\Users\\Jesse\\Documents\\Python\\TradingBot\\www\\static', template_folder='../www/static/templates')
-cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
+app = Flask(__name__, static_folder='../www/static', template_folder='../www/static/templates')
 
 # Add a rotating file handler to keep track of error logging
 if app.debug is not True:
@@ -24,7 +19,6 @@ def index():
 
 @app.route("/backtest", methods=['POST'])
 def backtesting():
-    import json
 
     coin_pair = request.args.get('pair')
     period_length = request.args.get('period')
@@ -35,10 +29,9 @@ def backtesting():
     post_data = request.get_json()
     indicators = post_data['indicators']
 
-
     result = backtest(coin_pair, period_length, capital, stop_loss, num_data, indicators)
 
-    return json.dumps({'response': 200, 'result': result})
+    return jsonify(response=200, result=result)
 
 
 if __name__ == '__main__':

@@ -23939,7 +23939,7 @@ var ControlPanel = function (_React$Component) {
           _react2.default.createElement(
             "option",
             { value: "", disabled: true, defaultValue: true },
-            "Choose and indicator..."
+            "Choose an indicator..."
           ),
           _react2.default.createElement(
             "option",
@@ -23955,6 +23955,11 @@ var ControlPanel = function (_React$Component) {
             "option",
             { value: "ma15" },
             "Moving Average (15 Period)"
+          ),
+          _react2.default.createElement(
+            "option",
+            { value: "rsi" },
+            "RSI"
           )
         );
       };
