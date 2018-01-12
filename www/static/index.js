@@ -24374,7 +24374,7 @@ var Plot = function (_React$Component) {
                                     // formatValue = d3.format(",.2f"),
                                     // formatCurrency = function(d) { return "$" + formatValue(d); };
 
-                                    var zoom = d3.zoom().scaleExtent([1, 4]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
+                                    var zoom = d3.zoom().scaleExtent([1, 8]).translateExtent([[-100, -100], [width + 90, height + 100]]).on("zoom", zoomed);
 
                                     // const parseTime = d3.timeParse("%d-%b-%y");
 

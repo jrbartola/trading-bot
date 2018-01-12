@@ -40,7 +40,7 @@ class Plot extends React.Component {
             // formatCurrency = function(d) { return "$" + formatValue(d); };
 
 	    const zoom = d3.zoom()
-            .scaleExtent([1, 4])
+            .scaleExtent([1, 8])
             .translateExtent([[-100, -100], [width + 90, height + 100]])
             .on("zoom", zoomed);
 
