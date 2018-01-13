@@ -173,7 +173,7 @@ class ControlPanel extends React.Component {
                             { strategyFields }
                           </div>
                           <div className="col s6 m3">
-                            <span className="card-title">Indicators</span>
+                            <span className="card-title">Plot</span>
                             { indicatorCheckboxes }
                           </div>
                         </div>

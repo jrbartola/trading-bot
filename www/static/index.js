@@ -24315,7 +24315,7 @@ var ControlPanel = function (_React$Component) {
                                     _react2.default.createElement(
                                         "span",
                                         { className: "card-title" },
-                                        "Indicators"
+                                        "Plot"
                                     ),
                                     indicatorCheckboxes
                                 )
