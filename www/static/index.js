@@ -23926,6 +23926,7 @@ var ControlPanel = function (_React$Component) {
 
         var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
 
+        _this.setupMaterializePlugins = _this.setupMaterializePlugins.bind(_this);
         _this.requestBacktest = _this.requestBacktest.bind(_this);
         _this.getStrategies = _this.getStrategies.bind(_this);
         _this.addCondition = _this.addCondition.bind(_this);
@@ -23935,6 +23936,11 @@ var ControlPanel = function (_React$Component) {
                 buy: [1],
                 sell: [1]
             } };
+
+        _this.acceptableIndicators = { "Current Price": "currentprice",
+            "Moving Average (9 Period)": "movingaverage9",
+            "Moving Average (15 Period)": "movingaverage15",
+            "RSI": "rsi" };
         return _this;
     }
 
@@ -23981,7 +23987,7 @@ var ControlPanel = function (_React$Component) {
                 return _react2.default.createElement(
                     "div",
                     null,
-                    _react2.default.createElement("input", { id: id, placeholder: "", type: "text", className: "validate" }),
+                    _react2.default.createElement("input", { id: id, placeholder: "", type: "text", className: "autocomplete" }),
                     _react2.default.createElement(
                         "label",
                         { htmlFor: id },
@@ -24342,16 +24348,33 @@ var ControlPanel = function (_React$Component) {
             );
         }
     }, {
-        key: "componentDidMount",
-        value: function componentDidMount() {
+        key: "setupMaterializePlugins",
+        value: function setupMaterializePlugins() {
             // Activate the dropdowns when the compoment mounts
             $('select').material_select();
+
+            // Activate autocomplete when the component mounts (setTimeout hack)
+            setTimeout(function () {
+                return $('.autocomplete').autocomplete({
+                    data: {
+                        "Current Price": null,
+                        "Moving Average (9 Period)": null,
+                        "Moving Average (15 Period)": null,
+                        "RSI": null
+                    },
+                    minLength: 0
+                });
+            }, 200);
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            this.setupMaterializePlugins();
         }
     }, {
         key: "componentDidUpdate",
         value: function componentDidUpdate() {
-            // Activate the material select dropdowns after the component has updated in case we added some
-            $('select').material_select();
+            this.setupMaterializePlugins();
         }
     }, {
         key: "requestBacktest",
@@ -24404,6 +24427,14 @@ var ControlPanel = function (_React$Component) {
                     buyComp = _ref[1],
                     buyVal = _ref[2];
 
+
+                if (isNaN(buyVal) && !buyVal in this.acceptableIndicators) {
+                    swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                    throw "Incorrect value for buy field";
+                }
+
+                buyVal = this.acceptableIndicators[buyVal];
+
                 buy_strategy[buyField] = { 'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal };
             }
 
@@ -24412,6 +24443,14 @@ var ControlPanel = function (_React$Component) {
                     sellField = _ref2[0],
                     sellComp = _ref2[1],
                     sellVal = _ref2[2];
+
+
+                if (isNaN(sellVal) && !(sellVal in this.acceptableIndicators)) {
+                    swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                    throw "Incorrect value for sell field";
+                }
+
+                sellVal = this.acceptableIndicators[sellVal];
 
                 sell_strategy[sellField] = { 'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal };
             }

@@ -5,6 +5,7 @@ class ControlPanel extends React.Component {
    constructor(props) {
        super(props);
 
+       this.setupMaterializePlugins = this.setupMaterializePlugins.bind(this);
        this.requestBacktest = this.requestBacktest.bind(this);
        this.getStrategies = this.getStrategies.bind(this);
        this.addCondition = this.addCondition.bind(this);
@@ -13,7 +14,12 @@ class ControlPanel extends React.Component {
        this.state = {conditions: {
            buy: [1],
            sell: [1]
-       }}
+       }};
+
+       this.acceptableIndicators = {"Current Price": "currentprice",
+                                    "Moving Average (9 Period)": "movingaverage9",
+                                    "Moving Average (15 Period)": "movingaverage15",
+                                    "RSI": "rsi"};
    }
 
    render() {
@@ -30,9 +36,9 @@ class ControlPanel extends React.Component {
                              </select>;
 
        const indicatorValue = (id) => <div>
-                                          <input id={id} placeholder="" type="text" className="validate" />
-                                          <label htmlFor={id}>Value</label>
-                                        </div>;
+                                      <input id={id} placeholder="" type="text" className="autocomplete" />
+                                      <label htmlFor={id}>Value</label>
+                                    </div>;
 
        const comparator = (id) =>
                           <select id={id} className="comparator">
@@ -188,14 +194,28 @@ class ControlPanel extends React.Component {
        )
    }
 
-   componentDidMount() {
+   setupMaterializePlugins() {
        // Activate the dropdowns when the compoment mounts
        $('select').material_select();
+
+       // Activate autocomplete when the component mounts (setTimeout hack)
+       setTimeout(() => $('.autocomplete').autocomplete({
+           data: {
+               "Current Price": null,
+               "Moving Average (9 Period)": null,
+               "Moving Average (15 Period)": null,
+               "RSI": null
+           },
+           minLength: 0
+       }), 200);
+   }
+
+   componentDidMount() {
+       this.setupMaterializePlugins();
    }
 
    componentDidUpdate() {
-       // Activate the material select dropdowns after the component has updated in case we added some
-       $('select').material_select();
+       this.setupMaterializePlugins();
    }
 
    requestBacktest() {
@@ -239,12 +259,28 @@ class ControlPanel extends React.Component {
        let sell_strategy = {};
 
        for (let i = 1; i <= buyConditions.length; i++) {
-           const [buyField, buyComp, buyVal] = [$(`#buy-field-${i}`).val(), $(`#buy-comparator-${i}`).val(), $(`#buy-value-${i}`).val()];
+           let [buyField, buyComp, buyVal] = [$(`#buy-field-${i}`).val(), $(`#buy-comparator-${i}`).val(), $(`#buy-value-${i}`).val()];
+
+           if (isNaN(buyVal) && !(buyVal) in this.acceptableIndicators) {
+               swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+               throw "Incorrect value for buy field";
+           }
+
+           buyVal = this.acceptableIndicators[buyVal];
+
            buy_strategy[buyField] = {'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal};
        }
 
        for (let i = 1; i <= sellConditions.length; i++) {
-           const [sellField, sellComp, sellVal] = [$(`#sell-field-${i}`).val(), $(`#sell-comparator-${i}`).val(), $(`#sell-value-${i}`).val()];
+           let [sellField, sellComp, sellVal] = [$(`#sell-field-${i}`).val(), $(`#sell-comparator-${i}`).val(), $(`#sell-value-${i}`).val()];
+
+           if (isNaN(sellVal) && !(sellVal in this.acceptableIndicators)) {
+               swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+               throw "Incorrect value for sell field";
+           }
+
+           sellVal = this.acceptableIndicators[sellVal];
+
            sell_strategy[sellField] = {'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal};
        }
 
