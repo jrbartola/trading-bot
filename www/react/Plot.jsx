@@ -68,8 +68,9 @@ class Plot extends React.Component {
 
         const gX = g.append("g")
             .attr("transform", "translate(0," + height + ")")
-            .call(xAxis)
-            .append("text")
+            .call(xAxis);
+
+        gX.append("text")
             .attr("fill", "#000")
             .attr("y", -6)
             .attr("dx", "85em")
@@ -77,8 +78,9 @@ class Plot extends React.Component {
             .text("Data Point #");
 
         const gY = g.append("g")
-            .call(yAxis)
-            .append("text")
+            .call(yAxis);
+
+        gY.append("text")
             .attr("fill", "#000")
             .attr("transform", "rotate(-90)")
             .attr("y", 6)
