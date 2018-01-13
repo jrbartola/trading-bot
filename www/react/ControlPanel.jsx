@@ -261,26 +261,32 @@ class ControlPanel extends React.Component {
        for (let i = 1; i <= buyConditions.length; i++) {
            let [buyField, buyComp, buyVal] = [$(`#buy-field-${i}`).val(), $(`#buy-comparator-${i}`).val(), $(`#buy-value-${i}`).val()];
 
-           if (isNaN(buyVal) && !(buyVal) in this.acceptableIndicators) {
-               swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
-               throw "Incorrect value for buy field";
+           if (isNaN(buyVal)) {
+
+               if (!(buyVal in this.acceptableIndicators)) {
+                   swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                   throw "Incorrect value for buy field";
+               }
+
+               buyVal = this.acceptableIndicators[buyVal];
+
            }
-
-           buyVal = this.acceptableIndicators[buyVal];
-
            buy_strategy[buyField] = {'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal};
        }
 
        for (let i = 1; i <= sellConditions.length; i++) {
            let [sellField, sellComp, sellVal] = [$(`#sell-field-${i}`).val(), $(`#sell-comparator-${i}`).val(), $(`#sell-value-${i}`).val()];
 
-           if (isNaN(sellVal) && !(sellVal in this.acceptableIndicators)) {
-               swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
-               throw "Incorrect value for sell field";
+           if (isNaN(sellVal)) {
+
+               if (!(sellVal in this.acceptableIndicators)) {
+                   swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                   throw "Incorrect value for sell field";
+               }
+
+               sellVal = this.acceptableIndicators[sellVal];
+
            }
-
-           sellVal = this.acceptableIndicators[sellVal];
-
            sell_strategy[sellField] = {'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal};
        }
 

@@ -24428,13 +24428,15 @@ var ControlPanel = function (_React$Component) {
                     buyVal = _ref[2];
 
 
-                if (isNaN(buyVal) && !buyVal in this.acceptableIndicators) {
-                    swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
-                    throw "Incorrect value for buy field";
+                if (isNaN(buyVal)) {
+
+                    if (!(buyVal in this.acceptableIndicators)) {
+                        swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                        throw "Incorrect value for buy field";
+                    }
+
+                    buyVal = this.acceptableIndicators[buyVal];
                 }
-
-                buyVal = this.acceptableIndicators[buyVal];
-
                 buy_strategy[buyField] = { 'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal };
             }
 
@@ -24445,13 +24447,15 @@ var ControlPanel = function (_React$Component) {
                     sellVal = _ref2[2];
 
 
-                if (isNaN(sellVal) && !(sellVal in this.acceptableIndicators)) {
-                    swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
-                    throw "Incorrect value for sell field";
+                if (isNaN(sellVal)) {
+
+                    if (!(sellVal in this.acceptableIndicators)) {
+                        swal("Uh oh!", "You must enter a number or one of the suggested indicators.", "error");
+                        throw "Incorrect value for sell field";
+                    }
+
+                    sellVal = this.acceptableIndicators[sellVal];
                 }
-
-                sellVal = this.acceptableIndicators[sellVal];
-
                 sell_strategy[sellField] = { 'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal };
             }
 
@@ -24600,9 +24604,13 @@ var Plot = function (_React$Component) {
                                     var xAxis = d3.axisBottom(x);
                                     var yAxis = d3.axisLeft(y);
 
-                                    var gX = g.append("g").attr("transform", "translate(0," + height + ")").call(xAxis).append("text").attr("fill", "#000").attr("y", -6).attr("dx", "85em").attr("text-anchor", "end").text("Data Point #");
+                                    var gX = g.append("g").attr("transform", "translate(0," + height + ")").call(xAxis);
 
-                                    var gY = g.append("g").call(yAxis).append("text").attr("fill", "#000").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("text-anchor", "end").text("Price (BTC)");
+                                    gX.append("text").attr("fill", "#000").attr("y", -6).attr("dx", "85em").attr("text-anchor", "end").text("Data Point #");
+
+                                    var gY = g.append("g").call(yAxis);
+
+                                    gY.append("text").attr("fill", "#000").attr("transform", "rotate(-90)").attr("y", 6).attr("dy", "0.71em").attr("text-anchor", "end").text("Price (BTC)");
 
                                     var inner = g.append("g");
 
@@ -24637,7 +24645,7 @@ var Plot = function (_React$Component) {
 
                                     focus.append("text").attr("x", 9).attr("dy", ".35em");
 
-                                    g.append("clipPath").attr("id", "clipped-path").append("rect").attr("class", "overlay").attr("width", width).attr("height", height);
+                                    inner.append("clipPath").attr("id", "clipped-path").append("rect").attr("class", "overlay").attr("width", width).attr("height", height);
 
                                     var view = g.append("rect").attr("pointer-events", "all").attr("class", "overlay").attr("width", width).attr("height", height).call(zoom);
 

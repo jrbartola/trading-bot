@@ -174,7 +174,7 @@ class Plot extends React.Component {
             .attr("x", 9)
             .attr("dy", ".35em");
 
-        g.append("clipPath")
+        inner.append("clipPath")
             .attr("id", "clipped-path")
             .append("rect")
             .attr("class", "overlay")
