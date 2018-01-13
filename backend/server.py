@@ -28,8 +28,10 @@ def backtesting():
 
     post_data = request.get_json()
     indicators = post_data['indicators']
+    buy_strategy = post_data['buyStrategy']
+    sell_strategy = post_data['sellStrategy']
 
-    result = backtest(coin_pair, period_length, capital, stop_loss, num_data, indicators)
+    result = backtest(coin_pair, period_length, capital, stop_loss, num_data, buy_strategy, sell_strategy, indicators)
 
     return jsonify(response=200, result=result)
 

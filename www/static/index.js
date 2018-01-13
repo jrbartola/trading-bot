@@ -23566,12 +23566,14 @@ var Dashboard = function (_React$Component) {
        * @param capital: The amount of Bitcoin to start out with
        * @param period: The number of time units to grab
        * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
+       * @param buyStrategy: An object containing the buy strategy for this set of backtesting data
+       * @param sellStrategy: An object containing the sell strategy for this set of backtesting data
        * @param indicators: An object containig key-value pairs of indicators and their parameters.
        */
 
   }, {
     key: 'getBacktestingData',
-    value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, indicators) {
+    value: function getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, buyStrategy, sellStrategy, indicators) {
       var _this2 = this;
 
       var url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital + "&stopLoss=" + stopLoss + "&dataPoints=" + period;
@@ -23584,7 +23586,7 @@ var Dashboard = function (_React$Component) {
         contentType: 'application/json',
         url: url,
         dataType: 'json',
-        data: JSON.stringify({ indicators: indicators }),
+        data: JSON.stringify({ indicators: indicators, buyStrategy: buyStrategy, sellStrategy: sellStrategy }),
         success: function success(data) {
 
           console.log("Got backtesting data:", data);
@@ -23897,8 +23899,10 @@ function convertOffset(x, y, degrees) {
 
 
 Object.defineProperty(exports, "__esModule", {
-  value: true
+    value: true
 });
+
+var _slicedToArray = function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"]) _i["return"](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError("Invalid attempt to destructure non-iterable instance"); } }; }();
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -23915,384 +23919,537 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var ControlPanel = function (_React$Component) {
-  _inherits(ControlPanel, _React$Component);
+    _inherits(ControlPanel, _React$Component);
 
-  function ControlPanel(props) {
-    _classCallCheck(this, ControlPanel);
+    function ControlPanel(props) {
+        _classCallCheck(this, ControlPanel);
 
-    var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (ControlPanel.__proto__ || Object.getPrototypeOf(ControlPanel)).call(this, props));
 
-    _this.requestBacktest = _this.requestBacktest.bind(_this);
-    return _this;
-  }
+        _this.requestBacktest = _this.requestBacktest.bind(_this);
+        _this.getStrategies = _this.getStrategies.bind(_this);
+        _this.addCondition = _this.addCondition.bind(_this);
+        _this.removeCondition = _this.removeCondition.bind(_this);
 
-  _createClass(ControlPanel, [{
-    key: "render",
-    value: function render() {
+        _this.state = { conditions: {
+                buy: [1],
+                sell: [1]
+            } };
+        return _this;
+    }
 
-      var showIndicators = this.props.showIndicators;
+    _createClass(ControlPanel, [{
+        key: "render",
+        value: function render() {
+            var _this2 = this;
 
-      var indicatorDropdown = function indicatorDropdown() {
-        return _react2.default.createElement(
-          "select",
-          { className: "indicator-dropdown" },
-          _react2.default.createElement(
-            "option",
-            { value: "", disabled: true, defaultValue: true },
-            "Choose an indicator..."
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "curr-price" },
-            "Current Price"
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "ma9" },
-            "Moving Average (9 Period)"
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "ma15" },
-            "Moving Average (15 Period)"
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "rsi" },
-            "RSI"
-          )
-        );
-      };
+            var showIndicators = this.props.showIndicators;
 
-      var comparator = function comparator() {
-        return _react2.default.createElement(
-          "select",
-          { className: "comparator" },
-          _react2.default.createElement(
-            "option",
-            { value: "", disabled: true, defaultValue: true },
-            "Choose..."
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "lt" },
-            "<"
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "eq" },
-            "="
-          ),
-          _react2.default.createElement(
-            "option",
-            { value: "gt" },
-            ">"
-          )
-        );
-      };
-
-      var coinFields = _react2.default.createElement(
-        "div",
-        null,
-        _react2.default.createElement(
-          "div",
-          { className: "row" },
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s6" },
-            _react2.default.createElement(
-              "select",
-              { id: "coin-pair" },
-              _react2.default.createElement(
-                "option",
-                { value: "", disabled: true, defaultValue: true },
-                "Pick a coin pair..."
-              ),
-              this.props.coinPairs.map(function (pair) {
+            var indicatorDropdown = function indicatorDropdown(id) {
                 return _react2.default.createElement(
-                  "option",
-                  { key: pair, value: pair },
-                  pair
+                    "select",
+                    { id: id, className: "indicator-dropdown" },
+                    _react2.default.createElement(
+                        "option",
+                        { value: "", disabled: true, defaultValue: true },
+                        "Choose an indicator..."
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "currentprice" },
+                        "Current Price"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "movingaverage9" },
+                        "Moving Average (9 Period)"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "movingaverage15" },
+                        "Moving Average (15 Period)"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "rsi" },
+                        "RSI"
+                    )
                 );
-              })
-            ),
-            _react2.default.createElement(
-              "label",
-              null,
-              "Coin Pair"
-            )
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s6" },
-            _react2.default.createElement("input", { placeholder: "Eg: 0.01", id: "amount-btc", type: "text", className: "validate" }),
-            _react2.default.createElement(
-              "label",
-              { className: "active", htmlFor: "amount-btc" },
-              "Capital"
-            )
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "row" },
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s4" },
-            _react2.default.createElement(
-              "select",
-              { id: "time-unit" },
-              _react2.default.createElement(
-                "option",
-                { value: "", disabled: true, defaultValue: true },
-                "Pick a time unit..."
-              ),
-              this.props.timeUnits.map(function (unit) {
+            };
+
+            var indicatorValue = function indicatorValue(id) {
                 return _react2.default.createElement(
-                  "option",
-                  { key: unit, value: unit },
-                  unit
+                    "div",
+                    null,
+                    _react2.default.createElement("input", { id: id, placeholder: "", type: "text", className: "validate" }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: id },
+                        "Value"
+                    )
                 );
-              })
-            ),
-            _react2.default.createElement(
-              "label",
-              null,
-              "Time Unit"
-            )
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s4" },
-            _react2.default.createElement("input", { defaultValue: "0", id: "stop-loss", type: "text", className: "validate" }),
-            _react2.default.createElement(
-              "label",
-              { className: "active", htmlFor: "stop-loss" },
-              "Stop Loss"
-            )
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s4" },
-            _react2.default.createElement("input", { defaultValue: "all", id: "num-data", type: "text", className: "validate" }),
-            _react2.default.createElement(
-              "label",
-              { className: "active", htmlFor: "num-data" },
-              "# Data Points"
-            )
-          )
-        )
-      );
+            };
 
-      var strategyFields = _react2.default.createElement(
-        "div",
-        { className: "input-field col s12" },
-        _react2.default.createElement(
-          "div",
-          { className: "row" },
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s5" },
-            indicatorDropdown(),
-            _react2.default.createElement(
-              "label",
-              null,
-              "Buy When"
-            )
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s2" },
-            comparator()
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s5" },
-            indicatorDropdown()
-          )
-        ),
-        _react2.default.createElement(
-          "div",
-          { className: "row" },
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s5" },
-            indicatorDropdown(),
-            _react2.default.createElement(
-              "label",
-              null,
-              "Sell When"
-            )
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s2" },
-            comparator()
-          ),
-          _react2.default.createElement(
-            "div",
-            { className: "input-field col s5" },
-            indicatorDropdown()
-          )
-        )
-      );
+            var comparator = function comparator(id) {
+                return _react2.default.createElement(
+                    "select",
+                    { id: id, className: "comparator" },
+                    _react2.default.createElement(
+                        "option",
+                        { value: "", disabled: true, defaultValue: true },
+                        "Choose..."
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "LT" },
+                        "<"
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "EQ" },
+                        "="
+                    ),
+                    _react2.default.createElement(
+                        "option",
+                        { value: "GT" },
+                        ">"
+                    )
+                );
+            };
 
-      var indicatorCheckboxes = _react2.default.createElement(
-        "form",
-        { action: "#" },
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "bbands-box", defaultChecked: showIndicators.bollinger }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "bbands-box" },
-            "Bollinger Bands"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "ma-9-box", defaultChecked: showIndicators.movingaverage9 }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "ma-9-box" },
-            "Moving Average (9 Period)"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "ma-15-box", defaultChecked: showIndicators.movingaverage15 }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "ma-15-box" },
-            "Moving Average (15 Period)"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "macd", defaultChecked: showIndicators.macd }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "macd" },
-            "MACD"
-          )
-        ),
-        _react2.default.createElement(
-          "p",
-          null,
-          _react2.default.createElement("input", { type: "checkbox", id: "rsi", defaultChecked: showIndicators.rsi }),
-          _react2.default.createElement(
-            "label",
-            { htmlFor: "rsi" },
-            "Relative Strength Index"
-          )
-        )
-      );
+            var coinFields = _react2.default.createElement(
+                "div",
+                null,
+                _react2.default.createElement(
+                    "div",
+                    { className: "row" },
+                    _react2.default.createElement(
+                        "div",
+                        { className: "input-field col s6" },
+                        _react2.default.createElement(
+                            "select",
+                            { id: "coin-pair" },
+                            _react2.default.createElement(
+                                "option",
+                                { value: "", disabled: true, defaultValue: true },
+                                "Pick a coin pair..."
+                            ),
+                            this.props.coinPairs.map(function (pair) {
+                                return _react2.default.createElement(
+                                    "option",
+                                    { key: pair, value: pair },
+                                    pair
+                                );
+                            })
+                        ),
+                        _react2.default.createElement(
+                            "label",
+                            null,
+                            "Coin Pair"
+                        )
+                    ),
+                    _react2.default.createElement(
+                        "div",
+                        { className: "input-field col s6" },
+                        _react2.default.createElement("input", { placeholder: "Eg: 0.01", id: "amount-btc", type: "text", className: "validate" }),
+                        _react2.default.createElement(
+                            "label",
+                            { className: "active", htmlFor: "amount-btc" },
+                            "Capital"
+                        )
+                    )
+                ),
+                _react2.default.createElement(
+                    "div",
+                    { className: "row" },
+                    _react2.default.createElement(
+                        "div",
+                        { className: "input-field col s4" },
+                        _react2.default.createElement(
+                            "select",
+                            { id: "time-unit" },
+                            _react2.default.createElement(
+                                "option",
+                                { value: "", disabled: true, defaultValue: true },
+                                "Pick a time unit..."
+                            ),
+                            this.props.timeUnits.map(function (unit) {
+                                return _react2.default.createElement(
+                                    "option",
+                                    { key: unit, value: unit },
+                                    unit
+                                );
+                            })
+                        ),
+                        _react2.default.createElement(
+                            "label",
+                            null,
+                            "Time Unit"
+                        )
+                    ),
+                    _react2.default.createElement(
+                        "div",
+                        { className: "input-field col s4" },
+                        _react2.default.createElement("input", { defaultValue: "0", id: "stop-loss", type: "text", className: "validate" }),
+                        _react2.default.createElement(
+                            "label",
+                            { className: "active", htmlFor: "stop-loss" },
+                            "Stop Loss"
+                        )
+                    ),
+                    _react2.default.createElement(
+                        "div",
+                        { className: "input-field col s4" },
+                        _react2.default.createElement("input", { defaultValue: "all", id: "num-data", type: "text", className: "validate" }),
+                        _react2.default.createElement(
+                            "label",
+                            { className: "active", htmlFor: "num-data" },
+                            "# Data Points"
+                        )
+                    )
+                )
+            );
 
-      return _react2.default.createElement(
-        "div",
-        { className: "row" },
-        _react2.default.createElement(
-          "div",
-          { className: "col s12 m12" },
-          _react2.default.createElement(
-            "div",
-            { className: "card light-blue accent-3" },
-            _react2.default.createElement(
-              "div",
-              { className: "card-content white-text" },
-              _react2.default.createElement(
+            var strategyFields = _react2.default.createElement(
+                "div",
+                { className: "input-field col s12 strategy-container" },
+                this.state.conditions.buy.map(function (index) {
+                    return _react2.default.createElement(
+                        "div",
+                        { key: "buyrow-" + index, className: "row" },
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s5" },
+                            indicatorDropdown("buy-field-" + index),
+                            _react2.default.createElement(
+                                "label",
+                                null,
+                                "Buy When"
+                            )
+                        ),
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s2" },
+                            comparator("buy-comparator-" + index)
+                        ),
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s5" },
+                            indicatorValue("buy-value-" + index)
+                        )
+                    );
+                }),
+                _react2.default.createElement(
+                    "div",
+                    { className: "row" },
+                    _react2.default.createElement(
+                        "a",
+                        { onClick: function onClick() {
+                                return _this2.addCondition('BUY');
+                            }, className: "btn btn-small btn-floating waves-effect waves-light" },
+                        _react2.default.createElement(
+                            "i",
+                            { className: "material-icons" },
+                            "add"
+                        )
+                    ),
+                    _react2.default.createElement(
+                        "a",
+                        { disabled: this.state.conditions.buy.length == 1, onClick: function onClick() {
+                                return _this2.removeCondition('BUY');
+                            }, className: "btn btn-small btn-floating waves-effect waves-light right" },
+                        _react2.default.createElement(
+                            "i",
+                            { className: "material-icons" },
+                            "remove"
+                        )
+                    )
+                ),
+                this.state.conditions.sell.map(function (index) {
+                    return _react2.default.createElement(
+                        "div",
+                        { key: "sellrow-" + index, className: "row" },
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s5" },
+                            indicatorDropdown("sell-field-" + index),
+                            _react2.default.createElement(
+                                "label",
+                                null,
+                                "Sell When"
+                            )
+                        ),
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s2" },
+                            comparator("sell-comparator-" + index)
+                        ),
+                        _react2.default.createElement(
+                            "div",
+                            { className: "input-field col s5" },
+                            indicatorValue("sell-value-" + index)
+                        )
+                    );
+                }),
+                _react2.default.createElement(
+                    "div",
+                    { className: "row" },
+                    _react2.default.createElement(
+                        "a",
+                        { onClick: function onClick() {
+                                return _this2.addCondition('SELL');
+                            }, className: "btn btn-small btn-floating waves-effect waves-light" },
+                        _react2.default.createElement(
+                            "i",
+                            { className: "material-icons" },
+                            "add"
+                        )
+                    ),
+                    _react2.default.createElement(
+                        "a",
+                        { disabled: this.state.conditions.sell.length == 1, onClick: function onClick() {
+                                return _this2.removeCondition('SELL');
+                            }, className: "btn btn-small btn-floating waves-effect waves-light right" },
+                        _react2.default.createElement(
+                            "i",
+                            { className: "material-icons" },
+                            "remove"
+                        )
+                    )
+                )
+            );
+
+            var indicatorCheckboxes = _react2.default.createElement(
+                "form",
+                { action: "#" },
+                _react2.default.createElement(
+                    "p",
+                    null,
+                    _react2.default.createElement("input", { type: "checkbox", id: "bbands-box", defaultChecked: showIndicators.bollinger }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "bbands-box" },
+                        "Bollinger Bands"
+                    )
+                ),
+                _react2.default.createElement(
+                    "p",
+                    null,
+                    _react2.default.createElement("input", { type: "checkbox", id: "ma-9-box", defaultChecked: showIndicators.movingaverage9 }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "ma-9-box" },
+                        "Moving Average (9 Period)"
+                    )
+                ),
+                _react2.default.createElement(
+                    "p",
+                    null,
+                    _react2.default.createElement("input", { type: "checkbox", id: "ma-15-box", defaultChecked: showIndicators.movingaverage15 }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "ma-15-box" },
+                        "Moving Average (15 Period)"
+                    )
+                ),
+                _react2.default.createElement(
+                    "p",
+                    null,
+                    _react2.default.createElement("input", { type: "checkbox", id: "macd", defaultChecked: showIndicators.macd }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "macd" },
+                        "MACD"
+                    )
+                ),
+                _react2.default.createElement(
+                    "p",
+                    null,
+                    _react2.default.createElement("input", { type: "checkbox", id: "rsi", defaultChecked: showIndicators.rsi }),
+                    _react2.default.createElement(
+                        "label",
+                        { htmlFor: "rsi" },
+                        "Relative Strength Index"
+                    )
+                )
+            );
+
+            return _react2.default.createElement(
                 "div",
                 { className: "row" },
                 _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Coin Information"
-                  ),
-                  coinFields
-                ),
-                _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Strategy"
-                  ),
-                  strategyFields
-                ),
-                _react2.default.createElement(
-                  "div",
-                  { className: "col s6 m4" },
-                  _react2.default.createElement(
-                    "span",
-                    { className: "card-title" },
-                    "Indicators"
-                  ),
-                  indicatorCheckboxes
+                    "div",
+                    { className: "col s12 m12" },
+                    _react2.default.createElement(
+                        "div",
+                        { className: "card light-blue accent-3" },
+                        _react2.default.createElement(
+                            "div",
+                            { className: "card-content white-text" },
+                            _react2.default.createElement(
+                                "div",
+                                { className: "row" },
+                                _react2.default.createElement(
+                                    "div",
+                                    { className: "col s6 m4" },
+                                    _react2.default.createElement(
+                                        "span",
+                                        { className: "card-title" },
+                                        "Coin Information"
+                                    ),
+                                    coinFields
+                                ),
+                                _react2.default.createElement(
+                                    "div",
+                                    { className: "col s6 m5 strategy" },
+                                    _react2.default.createElement(
+                                        "span",
+                                        { className: "card-title" },
+                                        "Strategy"
+                                    ),
+                                    strategyFields
+                                ),
+                                _react2.default.createElement(
+                                    "div",
+                                    { className: "col s6 m3" },
+                                    _react2.default.createElement(
+                                        "span",
+                                        { className: "card-title" },
+                                        "Indicators"
+                                    ),
+                                    indicatorCheckboxes
+                                )
+                            )
+                        ),
+                        _react2.default.createElement(
+                            "div",
+                            { className: "card-action" },
+                            _react2.default.createElement(
+                                "a",
+                                { onClick: this.requestBacktest, className: "waves-effect waves-light btn btn-small" },
+                                "Begin"
+                            ),
+                            _react2.default.createElement(
+                                "h5",
+                                { className: "right white-text" },
+                                "Profit: ",
+                                this.props.profit,
+                                " BTC"
+                            )
+                        )
+                    )
                 )
-              )
-            ),
-            _react2.default.createElement(
-              "div",
-              { className: "card-action" },
-              _react2.default.createElement(
-                "a",
-                { onClick: this.requestBacktest, className: "waves-effect waves-light btn btn-small" },
-                "Begin"
-              ),
-              _react2.default.createElement(
-                "h5",
-                { className: "right white-text" },
-                "Profit: ",
-                this.props.profit,
-                " BTC"
-              )
-            )
-          )
-        )
-      );
-    }
-  }, {
-    key: "requestBacktest",
-    value: function requestBacktest() {
-      var coinPair = $('#coin-pair').val();
-      var timeUnit = $('#time-unit').val();
-      var capital = $('#amount-btc').val();
-      var stopLoss = $('#stop-loss').val();
-      var length = $('#num-data').val();
+            );
+        }
+    }, {
+        key: "componentDidMount",
+        value: function componentDidMount() {
+            // Activate the dropdowns when the compoment mounts
+            $('select').material_select();
+        }
+    }, {
+        key: "componentDidUpdate",
+        value: function componentDidUpdate() {
+            // Activate the material select dropdowns after the component has updated in case we added some
+            $('select').material_select();
+        }
+    }, {
+        key: "requestBacktest",
+        value: function requestBacktest() {
+            var coinPair = $('#coin-pair').val();
+            var timeUnit = $('#time-unit').val();
+            var capital = $('#amount-btc').val();
+            var stopLoss = $('#stop-loss').val();
+            var length = $('#num-data').val();
 
-      if (length == 'all') {
-        length = 999999;
-      }
+            if (length == 'all') {
+                length = 999999;
+            }
 
-      var indicators = {
-        'movingaverage': []
-      };
+            var indicators = {
+                'movingaverage': []
+            };
 
-      if ($('#bbands-box').is(':checked')) {
-        indicators['bollinger'] = 21;
-      }
+            if ($('#bbands-box').is(':checked')) {
+                indicators['bollinger'] = 21;
+            }
 
-      if ($('#ma-9-box').is(':checked')) {
-        indicators['movingaverage'].push(9);
-      }
+            if ($('#ma-9-box').is(':checked')) {
+                indicators['movingaverage'].push(9);
+            }
 
-      if ($('#ma-15-box').is(':checked')) {
-        indicators['movingaverage'].push(15);
-      }
+            if ($('#ma-15-box').is(':checked')) {
+                indicators['movingaverage'].push(15);
+            }
 
-      this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, indicators);
-    }
-  }]);
+            var _getStrategies = this.getStrategies(),
+                _getStrategies2 = _slicedToArray(_getStrategies, 2),
+                buyStrategy = _getStrategies2[0],
+                sellStrategy = _getStrategies2[1];
 
-  return ControlPanel;
+            this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, buyStrategy, sellStrategy, indicators);
+        }
+    }, {
+        key: "getStrategies",
+        value: function getStrategies() {
+            var buyConditions = this.state.conditions.buy;
+            var sellConditions = this.state.conditions.sell;
+
+            var buy_strategy = {};
+            var sell_strategy = {};
+
+            for (var i = 1; i <= buyConditions.length; i++) {
+                var _ref = [$("#buy-field-" + i).val(), $("#buy-comparator-" + i).val(), $("#buy-value-" + i).val()],
+                    buyField = _ref[0],
+                    buyComp = _ref[1],
+                    buyVal = _ref[2];
+
+                buy_strategy[buyField] = { 'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal };
+            }
+
+            for (var _i = 1; _i <= sellConditions.length; _i++) {
+                var _ref2 = [$("#sell-field-" + _i).val(), $("#sell-comparator-" + _i).val(), $("#sell-value-" + _i).val()],
+                    sellField = _ref2[0],
+                    sellComp = _ref2[1],
+                    sellVal = _ref2[2];
+
+                sell_strategy[sellField] = { 'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal };
+            }
+
+            console.log(buy_strategy, sell_strategy);
+            return [buy_strategy, sell_strategy];
+        }
+    }, {
+        key: "addCondition",
+        value: function addCondition(buyOrSell) {
+            // Make a deep clone of the state so it activates our component lifecycle methods
+            var conditions = JSON.parse(JSON.stringify(this.state.conditions));
+
+            if (buyOrSell == 'BUY') {
+                conditions.buy.push(conditions.buy.length + 1);
+                this.setState({ conditions: conditions });
+            } else if (buyOrSell == 'SELL') {
+                conditions.sell.push(conditions.sell.length + 1);
+                this.setState({ conditions: conditions });
+            }
+        }
+    }, {
+        key: "removeCondition",
+        value: function removeCondition(buyOrSell) {
+            // Make a deep clone of the state so it activates our component lifecycle methods
+            var conditions = JSON.parse(JSON.stringify(this.state.conditions));
+
+            if (buyOrSell == 'BUY') {
+                conditions.buy.pop();
+                this.setState({ conditions: conditions });
+            } else if (buyOrSell == 'SELL') {
+                conditions.sell.pop();
+                this.setState({ conditions: conditions });
+            }
+        }
+    }]);
+
+    return ControlPanel;
 }(_react2.default.Component);
 
 exports.default = ControlPanel;

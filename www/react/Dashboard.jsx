@@ -75,9 +75,11 @@ class Dashboard extends React.Component {
      * @param capital: The amount of Bitcoin to start out with
      * @param period: The number of time units to grab
      * @param stopLoss: The amount of BTC below the initial buy position to set a stop loss at
+     * @param buyStrategy: An object containing the buy strategy for this set of backtesting data
+     * @param sellStrategy: An object containing the sell strategy for this set of backtesting data
      * @param indicators: An object containig key-value pairs of indicators and their parameters.
      */
-	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, indicators) {
+	getBacktestingData(coinPair, timeUnit, capital, period, stopLoss, buyStrategy, sellStrategy, indicators) {
 	    const url = "http://localhost:5000/backtest?pair=" + coinPair + "&period=" + timeUnit + "&capital=" + capital +
                     "&stopLoss=" + stopLoss + "&dataPoints=" + period;
 
@@ -89,7 +91,7 @@ class Dashboard extends React.Component {
             contentType: 'application/json',
             url: url,
             dataType: 'json',
-            data: JSON.stringify({indicators: indicators}),
+            data: JSON.stringify({indicators: indicators, buyStrategy: buyStrategy, sellStrategy: sellStrategy}),
             success: data => {
 
                 console.log("Got backtesting data:", data);

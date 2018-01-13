@@ -161,12 +161,13 @@ class Strategy(object):
             plt.plot(timestamp, price, 'rx')
 
 from indicators.backtesting_indicators import BacktestingIndicators
+from decision import Decision
 
 '''
 BackTesting Strategy
 '''
 class BacktestingStrategy(object):
-    def __init__(self, pair, capital, trading_fee=0, stop_loss=0):
+    def __init__(self, pair, capital, buy_strategy, sell_strategy, trading_fee=0, stop_loss=0):
         self.output = Logger()
         self.prices = []
         self.trades = []
@@ -177,6 +178,8 @@ class BacktestingStrategy(object):
         self.profit = 0
         self.pair = pair
         self.reserve = capital
+        self.buy_strategy = buy_strategy
+        self.sell_stategy = sell_strategy
         self.trading_fee = trading_fee
         self.stop_loss = stop_loss
 
@@ -196,12 +199,16 @@ class BacktestingStrategy(object):
         bb1, bb2 = self.indicators.historical_bollinger_bands(self.prices)
         bb_diff = bb1 - bb2
 
+
         for i in range(len(self.prices)):
+
+            decision = Decision({'currentprice': self.prices[i], 'rsi': rsi[i], 'movingaverage9': nine_period[i], 'movingaverage15': fifteen_period[i]})
+
             open_trades = [trade for trade in self.trades if trade.status == 'OPEN']
 
             ### CHECK TO SEE IF WE CAN OPEN A BUY POSITION
             if len(open_trades) < self.max_trades_at_once:
-                if self.prices[i] < nine_period[i] and self.prices[i] < fifteen_period[i] and rsi[i] < 50 and self.prices[i] < bb1[i] - 0.8 * bb_diff[i]:
+                if decision.should_buy(self.buy_strategy):
                     assert self.reserve > 0
 
                     self.buys.append((i, self.prices[i]))
@@ -212,8 +219,7 @@ class BacktestingStrategy(object):
 
             ### CHECK TO SEE IF WE NEED TO SELL ANY OPEN POSITIONS
             for trade in open_trades:
-                if self.prices[i] > (0.25 * bb_diff[i]) + trade.entry_price or (
-                            self.prices[i] > nine_period[i] and self.prices[i] > fifteen_period[i] and rsi[i] > 60):
+                if decision.should_sell(self.sell_stategy):
 
                     self.sells.append((i, self.prices[i]))
                     profit, total = trade.close(self.prices[i])

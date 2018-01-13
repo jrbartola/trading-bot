@@ -6,27 +6,40 @@ class ControlPanel extends React.Component {
        super(props);
 
        this.requestBacktest = this.requestBacktest.bind(this);
+       this.getStrategies = this.getStrategies.bind(this);
+       this.addCondition = this.addCondition.bind(this);
+       this.removeCondition = this.removeCondition.bind(this);
+
+       this.state = {conditions: {
+           buy: [1],
+           sell: [1]
+       }}
    }
 
    render() {
 
        const showIndicators = this.props.showIndicators;
 
-       const indicatorDropdown = () =>
-                            <select className="indicator-dropdown">
+       const indicatorDropdown = (id) =>
+                            <select id={id} className="indicator-dropdown">
                                <option value="" disabled defaultValue>Choose an indicator...</option>
-                                 <option value="curr-price">Current Price</option>
-                                 <option value="ma9">Moving Average (9 Period)</option>
-                                 <option value="ma15">Moving Average (15 Period)</option>
+                                 <option value="currentprice">Current Price</option>
+                                 <option value="movingaverage9">Moving Average (9 Period)</option>
+                                 <option value="movingaverage15">Moving Average (15 Period)</option>
                                  <option value="rsi">RSI</option>
                              </select>;
 
-       const comparator = () =>
-                          <select className="comparator">
+       const indicatorValue = (id) => <div>
+                                          <input id={id} placeholder="" type="text" className="validate" />
+                                          <label htmlFor={id}>Value</label>
+                                        </div>;
+
+       const comparator = (id) =>
+                          <select id={id} className="comparator">
                                <option value="" disabled defaultValue>Choose...</option>
-                               <option value="lt">&lt;</option>
-                               <option value="eq">=</option>
-                               <option value="gt">&gt;</option>
+                               <option value="LT">&lt;</option>
+                               <option value="EQ">=</option>
+                               <option value="GT">&gt;</option>
                           </select>;
 
        const coinFields = <div>
@@ -66,31 +79,60 @@ class ControlPanel extends React.Component {
                             </div>
                            </div>;
 
-       const strategyFields = <div className="input-field col s12">
+       const strategyFields = <div className="input-field col s12 strategy-container">
+                             { this.state.conditions.buy.map(index =>
+                                 <div key={`buyrow-${index}`} className="row">
+                                 <div className="input-field col s5">
+                                     { indicatorDropdown(`buy-field-${index}`) }
+                                 <label>Buy When</label>
+                                 </div>
+                                 <div className="input-field col s2">
+                                     { comparator(`buy-comparator-${index}`) }
+                                 </div>
+                                 <div className="input-field col s5">
+                                     {/*{ indicatorDropdown("buy-value") }*/}
+                                     { indicatorValue(`buy-value-${index}`) }
+                                 </div>
+                                 </div>
+                             )}
+
                              <div className="row">
-                             <div className="input-field col s5">
-                                 { indicatorDropdown() }
-                             <label>Buy When</label>
+                                 <a onClick={() => this.addCondition('BUY')} className="btn btn-small btn-floating waves-effect waves-light">
+                                     <i className="material-icons">add</i>
+                                 </a>
+
+                                 <a disabled={this.state.conditions.buy.length == 1} onClick={() => this.removeCondition('BUY')} className="btn btn-small btn-floating waves-effect waves-light right">
+                                     <i className="material-icons">remove</i>
+                                 </a>
                              </div>
-                             <div className="input-field col s2">
-                                 { comparator() }
-                             </div>
-                             <div className="input-field col s5">
-                                 { indicatorDropdown() }
-                             </div>
-                             </div>
+
+                             { this.state.conditions.sell.map(index =>
+                                 <div key={`sellrow-${index}`} className="row">
+                                 <div className="input-field col s5">
+                                     { indicatorDropdown(`sell-field-${index}`) }
+                                 <label>Sell When</label>
+                                 </div>
+                                 <div className="input-field col s2">
+                                     { comparator(`sell-comparator-${index}`) }
+                                 </div>
+                                 <div className="input-field col s5">
+                                     {/*{ indicatorDropdown("sell-value") }*/}
+                                     { indicatorValue(`sell-value-${index}`) }
+                                 </div>
+                                 </div>
+                             )}
+
                              <div className="row">
-                             <div className="input-field col s5">
-                                 { indicatorDropdown() }
-                             <label>Sell When</label>
+                                 <a onClick={() => this.addCondition('SELL')} className="btn btn-small btn-floating waves-effect waves-light">
+                                     <i className="material-icons">add</i>
+                                 </a>
+
+                                 <a disabled={this.state.conditions.sell.length == 1} onClick={() => this.removeCondition('SELL')} className="btn btn-small btn-floating waves-effect waves-light right">
+                                     <i className="material-icons">remove</i>
+                                 </a>
                              </div>
-                             <div className="input-field col s2">
-                                 { comparator() }
-                             </div>
-                             <div className="input-field col s5">
-                                 { indicatorDropdown() }
-                             </div>
-                             </div>
+
+
                            </div>;
 
        const indicatorCheckboxes = <form action="#">
@@ -126,11 +168,11 @@ class ControlPanel extends React.Component {
                             <span className="card-title">Coin Information</span>
                             { coinFields }
                           </div>
-                          <div className="col s6 m4">
+                          <div className="col s6 m5 strategy">
                             <span className="card-title">Strategy</span>
                             { strategyFields }
                           </div>
-                          <div className="col s6 m4">
+                          <div className="col s6 m3">
                             <span className="card-title">Indicators</span>
                             { indicatorCheckboxes }
                           </div>
@@ -144,6 +186,16 @@ class ControlPanel extends React.Component {
                 </div>
             </div>
        )
+   }
+
+   componentDidMount() {
+       // Activate the dropdowns when the compoment mounts
+       $('select').material_select();
+   }
+
+   componentDidUpdate() {
+       // Activate the material select dropdowns after the component has updated in case we added some
+       $('select').material_select();
    }
 
    requestBacktest() {
@@ -173,9 +225,57 @@ class ControlPanel extends React.Component {
            indicators['movingaverage'].push(15);
        }
 
+       const [buyStrategy, sellStrategy] = this.getStrategies();
 
 
-       this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, indicators);
+       this.props.getBacktestingData(coinPair, timeUnit, capital, length, stopLoss, buyStrategy, sellStrategy, indicators);
+   }
+
+   getStrategies() {
+       const buyConditions = this.state.conditions.buy;
+       const sellConditions = this.state.conditions.sell;
+
+       let buy_strategy = {};
+       let sell_strategy = {};
+
+       for (let i = 1; i <= buyConditions.length; i++) {
+           const [buyField, buyComp, buyVal] = [$(`#buy-field-${i}`).val(), $(`#buy-comparator-${i}`).val(), $(`#buy-value-${i}`).val()];
+           buy_strategy[buyField] = {'comparator': buyComp, 'value': isNaN(buyVal) ? buyVal : +buyVal};
+       }
+
+       for (let i = 1; i <= sellConditions.length; i++) {
+           const [sellField, sellComp, sellVal] = [$(`#sell-field-${i}`).val(), $(`#sell-comparator-${i}`).val(), $(`#sell-value-${i}`).val()];
+           sell_strategy[sellField] = {'comparator': sellComp, 'value': isNaN(sellVal) ? sellVal : +sellVal};
+       }
+
+       console.log(buy_strategy, sell_strategy);
+       return [buy_strategy, sell_strategy];
+   }
+
+   addCondition(buyOrSell) {
+       // Make a deep clone of the state so it activates our component lifecycle methods
+       const conditions = JSON.parse(JSON.stringify(this.state.conditions));
+
+       if (buyOrSell == 'BUY') {
+           conditions.buy.push(conditions.buy.length + 1);
+           this.setState({conditions: conditions});
+       } else if (buyOrSell == 'SELL') {
+           conditions.sell.push(conditions.sell.length + 1);
+           this.setState({conditions: conditions});
+       }
+   }
+
+   removeCondition(buyOrSell) {
+       // Make a deep clone of the state so it activates our component lifecycle methods
+       const conditions = JSON.parse(JSON.stringify(this.state.conditions));
+
+       if (buyOrSell == 'BUY') {
+           conditions.buy.pop();
+           this.setState({conditions: conditions});
+       } else if (buyOrSell == 'SELL') {
+           conditions.sell.pop();
+           this.setState({conditions: conditions});
+       }
    }
 
 }

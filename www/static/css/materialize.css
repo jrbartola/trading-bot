@@ -3732,13 +3732,13 @@ small {
   height: 40px;
   line-height: 40px;
   padding: 0;
-  background-color: #0089ec;
+  background-color: #e0be44;
   border-radius: 50%;
   transition: .3s;
   cursor: pointer;
   vertical-align: middle; }
   .btn-floating:hover {
-    background-color: #0089ec; }
+    background-color: #e0be44; }
   .btn-floating:before {
     border-radius: 0; }
   .btn-floating.btn-large {
@@ -3837,7 +3837,7 @@ button.btn-floating {
     z-index: -1;
     width: 40px;
     height: 40px;
-    background-color: #0089ec;
+    background-color: #e0be44;
     border-radius: 50%;
     transform: scale(0); }
 

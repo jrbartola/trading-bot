@@ -5,8 +5,12 @@ class Decision(object):
         self.indicators = indicators
 
     def should_buy(self, buy_strategy):
-        for indicator in buy_strategy:
-            comparator, value = indicator['comparator'], indicator['value']
+        for indicator, body in buy_strategy.items():
+
+            comparator, value = body['comparator'], body['value']
+
+            if not isinstance(value, (int, float)):
+                value = self.indicators[value]
 
             if comparator == 'LT':
                 if self.indicators[indicator] >= value:
@@ -23,8 +27,12 @@ class Decision(object):
         return True
 
     def should_sell(self, sell_strategy):
-        for indicator in sell_strategy:
-            comparator, value = indicator['comparator'], indicator['value']
+        for indicator, body in sell_strategy.items():
+
+            comparator, value = body['comparator'], body['value']
+
+            if not isinstance(value, (int, float)):
+                value = self.indicators[value]
 
             if comparator == 'LT':
                 if self.indicators[indicator] >= value:

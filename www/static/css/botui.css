@@ -13,4 +13,8 @@ body {
 .right {
   float: right; }
 
+.strategy-container {
+  overflow-y: auto;
+  max-height: 400px; }
+
 /*# sourceMappingURL=botui.css.map */
